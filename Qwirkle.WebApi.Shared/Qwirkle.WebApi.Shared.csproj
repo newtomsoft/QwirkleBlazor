@@ -5,6 +5,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Qwirkle.Domain\Qwirkle.Domain.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<SupportedPlatform Include="browser" />
 	</ItemGroup>
 

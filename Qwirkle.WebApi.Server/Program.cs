@@ -1,32 +1,26 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿var appBuilder = WebApplication.CreateBuilder(args);
+var cors = new Cors();
+appBuilder.Configuration.GetSection("Cors").Bind(cors);
+appBuilder.Host.UseSerilog((_, configuration) => configuration.ReadFrom.Configuration(appBuilder.Configuration));
+appBuilder.Services.AddDbContext<DefaultDbContext>(options => options.UseSqlServer(appBuilder.Configuration.GetConnectionString("Qwirkle")));
+appBuilder.Services.AddSignalR();
+appBuilder.Services.AddSingleton<INotification, SignalRNotification>();
+appBuilder.Services.AddSingleton<InstantGameService>();
+appBuilder.Services.AddScoped<IRepository, Repository>();
+appBuilder.Services.AddScoped<IAuthentication, Authentication>();
+appBuilder.Services.AddScoped<UserService>();
+appBuilder.Services.AddScoped<CoreService>();
+appBuilder.Services.AddScoped<InfoService>();
+appBuilder.Services.AddScoped<BotService>();
+appBuilder.Services.AddControllers();
+appBuilder.Services.AddIdentity();
+appBuilder.Services.AddQwirkleCors(cors);
+appBuilder.Services.AddOptions();
 
-// Add services to the container.
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-             options.UseSqlite("Filename=data.db"));
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
 
-builder.Services.Configure<IdentityOptions>(options =>
-{
-    // Password settings
-    options.Password.RequireDigit = true;
-    options.Password.RequiredLength = 6;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireLowercase = false;
-
-    // Lockout settings
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
-    options.Lockout.MaxFailedAccessAttempts = 10;
-    options.Lockout.AllowedForNewUsers = true;
-
-    // User settings
-    options.User.RequireUniqueEmail = false;
-});
-
-builder.Services.ConfigureApplicationCookie(options =>
+//appBuilder.Services.ConfigureApplicationCookie(options => options.LoginPath = "/login");
+appBuilder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
     options.Events.OnRedirectToLogin = context =>
@@ -37,19 +31,27 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 
-builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
 
-var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
+
+//appBuilder.Services.AddSession();
+
+//Added
+appBuilder.Services.AddControllersWithViews();
+appBuilder.Services.AddRazorPages();
+
+
+//******************* BUILD **************
+var app = appBuilder.Build();
+
 if (app.Environment.IsDevelopment())
 {
     using (var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
     {
         //Note: Microsoft recommends to NOT migrate your database at Startup. 
         //You should consider your migration strategy according to the guidelines.
-        serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.Migrate();
+        serviceScope.ServiceProvider.GetRequiredService<DefaultDbContext>().Database.Migrate();
     }
 
     app.UseWebAssemblyDebugging();
@@ -61,17 +63,123 @@ else
     app.UseHsts();
 }
 
+
+
+
+
+
+
+
 app.UseHttpsRedirection();
 
+
+//Added
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
+
 app.UseRouting();
+app.UseQwirkleCors();
 app.UseAuthentication();
 app.UseAuthorization();
+//app.UseSession();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapHub<HubQwirkle>("/hubGame");
+});
 
 app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 
 app.Run();
+
+
+
+
+
+
+
+
+
+
+
+
+//var builder = WebApplication.CreateBuilder(args);
+
+//// Add services to the container.
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//             options.UseSqlite("Filename=data.db"));
+
+//builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
+//    .AddEntityFrameworkStores<ApplicationDbContext>()
+//    .AddDefaultTokenProviders();
+
+//builder.Services.Configure<IdentityOptions>(options =>
+//{
+//    // Password settings
+//    options.Password.RequireDigit = true;
+//    options.Password.RequiredLength = 6;
+//    options.Password.RequireNonAlphanumeric = true;
+//    options.Password.RequireUppercase = true;
+//    options.Password.RequireLowercase = false;
+
+//    // Lockout settings
+//    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+//    options.Lockout.MaxFailedAccessAttempts = 10;
+//    options.Lockout.AllowedForNewUsers = true;
+
+//    // User settings
+//    options.User.RequireUniqueEmail = false;
+//});
+
+//builder.Services.ConfigureApplicationCookie(options =>
+//{
+//    options.Cookie.HttpOnly = true;
+//    options.Events.OnRedirectToLogin = context =>
+//    {
+//        context.Response.StatusCode = 401;
+//        return Task.CompletedTask;
+//    };
+//});
+
+
+//builder.Services.AddControllersWithViews();
+//builder.Services.AddRazorPages();
+
+//var app = builder.Build();
+
+//// Configure the HTTP request pipeline.
+//if (app.Environment.IsDevelopment())
+//{
+//    using (var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+//    {
+//        //Note: Microsoft recommends to NOT migrate your database at Startup. 
+//        //You should consider your migration strategy according to the guidelines.
+//        serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.Migrate();
+//    }
+
+//    app.UseWebAssemblyDebugging();
+//}
+//else
+//{
+//    app.UseExceptionHandler("/Error");
+//    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+//    app.UseHsts();
+//}
+
+//app.UseHttpsRedirection();
+
+//app.UseBlazorFrameworkFiles();
+//app.UseStaticFiles();
+
+//app.UseRouting();
+//app.UseAuthentication();
+//app.UseAuthorization();
+
+//app.MapRazorPages();
+//app.MapControllers();
+//app.MapFallbackToFile("index.html");
+
+//app.Run();
