@@ -5,3 +5,6 @@ global using Qwirkle.WebApi.Client.Blazor;
 global using Qwirkle.WebApi.Client.Blazor.Services.Contracts;
 global using Qwirkle.WebApi.Client.Blazor.Services.Implementations;
 global using Qwirkle.WebApi.Shared;
+global using System.Net;
+global using System.Net.Http.Json;
+global using System.Security.Claims;

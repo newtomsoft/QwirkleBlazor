@@ -1,6 +1,4 @@
-﻿using Qwirkle.Domain.Services;
-
-namespace Qwirkle.WebApi.Server.Controllers;
+﻿namespace Qwirkle.WebApi.Server.Controllers;
 
 [ApiController]
 [Authorize(Roles = "Admin")]

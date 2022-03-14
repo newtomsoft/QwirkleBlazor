@@ -1,15 +1,48 @@
-﻿using System.Security.Claims;
+﻿namespace Qwirkle.WebApi.Client.Blazor.Services.Implementations;
 
-namespace Qwirkle.WebApi.Client.Blazor.Services.Implementations;
 
-public class IdentityAuthenticationStateProvider : AuthenticationStateProvider
+public class MyAuthenticationStateProvider : AuthenticationStateProvider
 {
-    private UserInfo _userInfoCache;
+    private UserInfo _userInfo = new();
+
+    public async Task<AuthenticationState> GetToto(UserInfo userInfo)
+    {
+        _userInfo = userInfo;
+        return await GetAuthenticationStateAsync();
+    }
+
+
+    public override async Task<AuthenticationState> GetAuthenticationStateAsync()
+    {
+        var identity = new ClaimsIdentity();
+        try
+        {
+            if (_userInfo is { IsAuthenticated: true })
+            {
+                var claims = new[] { new Claim(ClaimTypes.Name, _userInfo.UserName) }.Concat(_userInfo.ExposedClaims.Select(c => new Claim(c.Key, c.Value)));
+                identity = new ClaimsIdentity(claims, "Server authentication");
+            }
+        }
+        catch (HttpRequestException exception)
+        {
+            Console.WriteLine($"Request failed: {exception}");
+        }
+        return new AuthenticationState(new ClaimsPrincipal(identity));
+    }
+}
+
+
+
+
+
+public class IdentityAuthenticationStateProvider : AuthenticationStateProvider, IIdentityAuthenticationStateProvider
+{
+    private UserInfo? _userInfoCache;
     private readonly IAuthorizeApi _authorizeApi;
 
     public IdentityAuthenticationStateProvider(IAuthorizeApi authorizeApi)
     {
-        this._authorizeApi = authorizeApi;
+        _authorizeApi = authorizeApi;
     }
 
     public async Task Login(LoginParameters loginParameters)
@@ -24,18 +57,17 @@ public class IdentityAuthenticationStateProvider : AuthenticationStateProvider
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
+    public async Task RegisterGuest()
+    {
+        await _authorizeApi.RegisterGuest();
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+    }
+
     public async Task Logout()
     {
         await _authorizeApi.Logout();
         _userInfoCache = null;
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-    }
-
-    private async Task<UserInfo> GetUserInfo()
-    {
-        if (_userInfoCache != null && _userInfoCache.IsAuthenticated) return _userInfoCache;
-        _userInfoCache = await _authorizeApi.GetUserInfo();
-        return _userInfoCache;
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -44,17 +76,23 @@ public class IdentityAuthenticationStateProvider : AuthenticationStateProvider
         try
         {
             var userInfo = await GetUserInfo();
-            if (userInfo.IsAuthenticated)
+            if (userInfo is { IsAuthenticated: true })
             {
                 var claims = new[] { new Claim(ClaimTypes.Name, userInfo.UserName) }.Concat(userInfo.ExposedClaims.Select(c => new Claim(c.Key, c.Value)));
                 identity = new ClaimsIdentity(claims, "Server authentication");
             }
         }
-        catch (HttpRequestException ex)
+        catch (HttpRequestException exception)
         {
-            Console.WriteLine("Request failed:" + ex.ToString());
+            Console.WriteLine($"Request failed: {exception}");
         }
-
         return new AuthenticationState(new ClaimsPrincipal(identity));
+    }
+
+    private async Task<UserInfo?> GetUserInfo()
+    {
+        if (_userInfoCache is { IsAuthenticated: true }) return _userInfoCache;
+        _userInfoCache = await _authorizeApi.GetUserInfo();
+        return _userInfoCache;
     }
 }

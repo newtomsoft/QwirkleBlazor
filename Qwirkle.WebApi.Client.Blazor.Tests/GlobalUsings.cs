@@ -1,0 +1,9 @@
+﻿global using System.Linq;
+global using Bunit;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.JSInterop;
+global using Moq;
+global using Shouldly;
+global using Xunit;
+global using Qwirkle.WebApi.Client.Blazor.Pages;
+global using Qwirkle.WebApi.Client.Blazor.Services.Contracts;

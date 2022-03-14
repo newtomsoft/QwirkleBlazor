@@ -1,10 +1,9 @@
-﻿namespace Qwirkle.WebApi.Client.Blazor.Services.Contracts;
+﻿namespace Qwirkle.WebApi.Client.Blazor.Services.Implementations;
 
-public interface IAuthorizeApi
+public interface IIdentityAuthenticationStateProvider
 {
     Task Login(LoginParameters loginParameters);
     Task Register(RegisterParameters registerParameters);
     Task RegisterGuest();
     Task Logout();
-    Task<UserInfo> GetUserInfo();
 }

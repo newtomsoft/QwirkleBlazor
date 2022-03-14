@@ -18,7 +18,7 @@ public class UserController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("Register")]
-    public async Task<ActionResult> RegisterAsync(UserModel userModel) => IsAuthenticated() ? AlreadyAuthenticated() : new ObjectResult(await _userService.Register(userModel.ToUser(), userModel.Password));
+    public async Task<ActionResult> RegisterAsync(RegisterParameters registerParameters) => IsAuthenticated() ? AlreadyAuthenticated() : new ObjectResult(await _userService.Register(registerParameters.ToUser(), registerParameters.Password));
 
 
     [AllowAnonymous]
@@ -36,12 +36,12 @@ public class UserController : ControllerBase
     }
 
 
-    [HttpGet("Logout")]
+    [HttpPost("Logout")]
     public async Task LogoutAsync() => await _userService.LogOutAsync();
 
 
     [AllowAnonymous]
-    [HttpGet("UserInfo")]
+    [HttpGet("Info")]
     public UserInfo UserInfo()
     {
         //var user = await _userManager.GetUserAsync(HttpContext.User);

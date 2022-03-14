@@ -1,4 +1,6 @@
-﻿namespace Qwirkle.WebApi.Server.ExtensionMethods;
+﻿using System.Security.Claims;
+
+namespace Qwirkle.WebApi.Server.ExtensionMethods;
 
 public static class StartupExtensionMethods
 {
@@ -27,6 +29,7 @@ public static class StartupExtensionMethods
             options.Password.RequiredLength = 6;
             options.Password.RequiredUniqueChars = 2;
             options.User.RequireUniqueEmail = true;
+            options.ClaimsIdentity.RoleClaimType = "role";
         }).AddRoleManager<RoleManager<IdentityRole<int>>>()
           .AddEntityFrameworkStores<DefaultDbContext>()
           .AddDefaultTokenProviders()
