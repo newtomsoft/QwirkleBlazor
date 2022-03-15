@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-namespace Qwirkle.WebApi.Server.ExtensionMethods;
+﻿namespace Qwirkle.WebApi.Server.ExtensionMethods;
 
 public static class StartupExtensionMethods
 {

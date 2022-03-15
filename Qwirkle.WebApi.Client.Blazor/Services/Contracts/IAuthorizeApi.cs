@@ -2,8 +2,8 @@
 
 public interface IAuthorizeApi
 {
-    Task Login(LoginParameters loginParameters);
-    Task Register(RegisterParameters registerParameters);
+    Task Login(LoginModel loginModel);
+    Task Register(RegisterModel registerModel);
     Task RegisterGuest();
     Task Logout();
     Task<UserInfo> GetUserInfo();

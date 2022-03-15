@@ -1,4 +1,6 @@
-﻿namespace Qwirkle.Infra.Repository;
+﻿using Qwirkle.Domain.Services;
+
+namespace Qwirkle.Infra.Repository;
 
 public class DefaultDbContext : IdentityDbContext<UserDao, IdentityRole<int>, int>
 {
@@ -21,13 +23,9 @@ public class DefaultDbContext : IdentityDbContext<UserDao, IdentityRole<int>, in
         // Method intentionally left empty.
     }
 
-    private const string RoleBotName = "Bot";
     private const int RoleBotId = 1;
-    private const string RoleAdminName = "Admin";
     private const int RoleAdminId = 2;
-    private const string RoleGuestName = "Guest";
     private const int RoleGuestId = 3;
-    private const string RoleUserName = "User";
     private const int RoleUserId = 4;
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -53,7 +51,7 @@ public class DefaultDbContext : IdentityDbContext<UserDao, IdentityRole<int>, in
 
     private static void CreateBots(ModelBuilder builder, int idStart, int botsNumber)
     {
-        builder.Entity<IdentityRole<int>>().HasData(new IdentityRole<int> { Id = RoleBotId, Name = RoleBotName, NormalizedName = RoleBotName.ToUpper() });
+        builder.Entity<IdentityRole<int>>().HasData(new IdentityRole<int> { Id = RoleBotId, Name = UserService.RoleBotName, NormalizedName = UserService.RoleBotName.ToUpper() });
         for (var userId = idStart; userId < idStart + botsNumber; userId++)
         {
             var botName = "bot" + userId;
@@ -73,7 +71,7 @@ public class DefaultDbContext : IdentityDbContext<UserDao, IdentityRole<int>, in
         const string jcPassword2 = "NTApuuwLJsc1Sf9xRquQWPIz2S8rUQ==";
 
         var userId = userIdStart;
-        builder.Entity<IdentityRole<int>>().HasData(new IdentityRole<int> { Id = RoleAdminId, Name = RoleAdminName, NormalizedName = RoleAdminName.ToUpper() });
+        builder.Entity<IdentityRole<int>>().HasData(new IdentityRole<int> { Id = RoleAdminId, Name = UserService.RoleAdminName, NormalizedName = UserService.RoleAdminName.ToUpper() });
 
         builder.Entity<UserDao>().HasData(new UserDao { Id = userId, UserName = "Tom", NormalizedUserName = "TOM", Email = "thomas@newtomsoft.fr", NormalizedEmail = "THOMAS@NEWTOMSOFT.FR", FirstName = "Thomas", LastName = "Vuille", PasswordHash = tomPassword0 + tomPassword1 + tomPassword2, LockoutEnabled = false, SecurityStamp = Guid.NewGuid().ToString("N").ToUpper() });
         builder.Entity<IdentityUserRole<int>>().HasData(new IdentityUserRole<int> { UserId = userId, RoleId = RoleAdminId });
@@ -82,7 +80,7 @@ public class DefaultDbContext : IdentityDbContext<UserDao, IdentityRole<int>, in
         builder.Entity<IdentityUserRole<int>>().HasData(new IdentityUserRole<int> { UserId = userId, RoleId = RoleAdminId });
     }
 
-    private static void CreateGuestRole(ModelBuilder builder) => builder.Entity<IdentityRole<int>>().HasData(new IdentityRole<int> { Id = RoleGuestId, Name = RoleGuestName, NormalizedName = RoleGuestName.ToUpper() });
+    private static void CreateGuestRole(ModelBuilder builder) => builder.Entity<IdentityRole<int>>().HasData(new IdentityRole<int> { Id = RoleGuestId, Name = UserService.RoleGuestName, NormalizedName = UserService.RoleGuestName.ToUpper() });
 
-    private static void CreateUserRole(ModelBuilder builder) => builder.Entity<IdentityRole<int>>().HasData(new IdentityRole<int> { Id = RoleUserId, Name = RoleUserName, NormalizedName = RoleUserName.ToUpper() });
+    private static void CreateUserRole(ModelBuilder builder) => builder.Entity<IdentityRole<int>>().HasData(new IdentityRole<int> { Id = RoleUserId, Name = UserService.RoleUserName, NormalizedName = UserService.RoleUserName.ToUpper() });
 }

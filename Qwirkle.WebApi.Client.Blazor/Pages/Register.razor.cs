@@ -1,17 +1,21 @@
-﻿namespace Qwirkle.WebApi.Client.Blazor.Pages;
+﻿using Qwirkle.Domain.Services;
+
+namespace Qwirkle.WebApi.Client.Blazor.Pages;
 
 public partial class Register
 {
-    RegisterParameters RegisterParameters { get; set; } = new();
-    string Error { get; set; }
+    [Inject] private NavigationManager? NavigationManager { get; set; }
+    [Inject] private IdentityAuthenticationStateProvider? AuthStateProvider { get; set; }
 
-    async Task RegisterUser()
+    private RegisterModel RegisterModel { get; } = new() { SignInPersistent = true };
+    private string Error { get; set; } = string.Empty;
+
+    private async Task RegisterUser()
     {
-        Error = null;
         try
         {
-            await authStateProvider.Register(RegisterParameters);
-            navigationManager.NavigateTo("");
+            await AuthStateProvider!.Register(RegisterModel);
+            NavigationManager!.NavigateTo(Constant.PageHome);
         }
         catch (Exception ex)
         {
@@ -21,7 +25,7 @@ public partial class Register
 
     private async Task LoginAsGuest()
     {
-        await authStateProvider.RegisterGuest();
-        navigationManager.NavigateTo("");
+        await AuthStateProvider!.RegisterGuest();
+        NavigationManager!.NavigateTo(Constant.PageInstantGame);
     }
 }

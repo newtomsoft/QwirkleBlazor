@@ -5,7 +5,6 @@
 [Route("Action")]
 public class ActionController : ControllerBase
 {
-    private readonly UserService _userService;
     private readonly BotService _botService;
     private readonly ILogger<ActionController> _logger;
     private readonly INotification _notification;
@@ -14,13 +13,12 @@ public class ActionController : ControllerBase
     private readonly UserManager<UserDao> _userManager;
     private int UserId => int.Parse(_userManager.GetUserId(User) ?? "0");
 
-    public ActionController(CoreService coreService, InfoService infoService, UserManager<UserDao> userManager, INotification notification, UserService userService, BotService botService, ILogger<ActionController> logger)
+    public ActionController(CoreService coreService, InfoService infoService, UserManager<UserDao> userManager, INotification notification, BotService botService, ILogger<ActionController> logger)
     {
         _coreService = coreService;
         _infoService = infoService;
         _userManager = userManager;
         _notification = notification;
-        _userService = userService;
         _botService = botService;
         _logger = logger;
     }
@@ -59,11 +57,11 @@ public class ActionController : ControllerBase
     }
 
     [HttpPost("SkipTurn/")]
-    public async Task<ActionResult> SkipTurn(SkipTurnModel skipTurnViewModel)
+    public async Task<ActionResult> SkipTurn(SkipTurnModel skipTurnModel)
     {
-        var playerId = _infoService.GetPlayerId(skipTurnViewModel.GameId, UserId);
+        var playerId = _infoService.GetPlayerId(skipTurnModel.GameId, UserId);
         var skipTurnReturn = _coreService.TrySkipTurn(playerId);
-        if (skipTurnReturn.Code == ReturnCode.Ok) await NotifyNextPlayerAndPlayIfBotAsync(skipTurnViewModel.GameId);
+        if (skipTurnReturn.Code == ReturnCode.Ok) await NotifyNextPlayerAndPlayIfBotAsync(skipTurnModel.GameId);
         return new ObjectResult(skipTurnReturn);
     }
 

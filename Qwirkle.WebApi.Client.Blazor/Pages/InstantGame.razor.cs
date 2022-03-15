@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Components;
-
-namespace Qwirkle.WebApi.Client.Blazor.Pages;
+﻿namespace Qwirkle.WebApi.Client.Blazor.Pages;
 
 public partial class InstantGame
 {
-    [Inject] 
+    [Inject]
     private NavigationManager _navigationManager { get; set; }
 
     [CascadingParameter]

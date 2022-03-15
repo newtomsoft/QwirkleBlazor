@@ -2,10 +2,10 @@
 
 public interface IActionApi
 {
-    Task PlayTiles(List<TileModel> tiles);
+    Task<PlayReturn> PlayTiles(List<TileModel> tiles);
     Task PlayTilesSimulation(List<TileModel> tiles);
     Task SwapTiles(List<TileModel> tiles);
-    Task SkipTurn(SkipTurnModel skipTurnViewModel);
+    Task<SkipTurnReturn> SkipTurn(SkipTurnModel skipTurnModel);
     Task ArrangeRack(List<TileModel> tiles);
     Task<UserInfo?> GetUserInfo();
 }

@@ -2,16 +2,19 @@
 
 public partial class Login
 {
-    LoginParameters LoginParameters { get; set; } = new() { RememberMe = true };
-    string Error { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private IdentityAuthenticationStateProvider AuthStateProvider { get; set; }
 
-    async Task LoginAsUser()
+    private LoginModel LoginModel { get; } = new() { RememberMe = true };
+    private string Error { get; set; } = string.Empty;
+
+
+    private async Task LoginAsUser()
     {
-        Error = null;
         try
         {
-            await authStateProvider.Login(LoginParameters);
-            navigationManager.NavigateTo("");
+            await AuthStateProvider.Login(LoginModel);
+            NavigationManager.NavigateTo(Constant.PageHome);
         }
         catch (Exception ex)
         {
@@ -21,8 +24,8 @@ public partial class Login
 
     private async Task LoginAsGuest()
     {
-        await authStateProvider.RegisterGuest();
-        navigationManager.NavigateTo("");
+        await AuthStateProvider.RegisterGuest();
+        NavigationManager.NavigateTo(Constant.PageInstantGame);
     }
 }
 

@@ -1,6 +1,6 @@
-﻿namespace Qwirkle.Test;
+﻿namespace Qwirkle.Tests.Integration;
 
-public class CreateGameWithUsersIdsShould
+public class CreateGameWithOnlyBots
 {
     #region privates
     private readonly CoreService _coreService;
@@ -15,7 +15,7 @@ public class CreateGameWithUsersIdsShould
     private const int Human3Id = 102;
     private const int Human4Id = 103;
 
-    public CreateGameWithUsersIdsShould()
+    public CreateGameWithOnlyBots()
     {
         var connectionFactory = new ConnectionFactory();
         _dbContext = connectionFactory.CreateContextForInMemory();
@@ -65,7 +65,7 @@ public class CreateGameWithUsersIdsShould
     };
     [Theory(DisplayName = "test with n players all bots")]
     [MemberData(nameof(UsersOnGames))]
-    public async Task ReturnFinishGameWhenPlayersAreBots(HashSet<int> usersIds)
+    public async Task ShouldFinishGame(HashSet<int> usersIds)
     {
         var usersNumber = usersIds.Count;
         var gameId = await _coreService.CreateGameAsync(usersIds);

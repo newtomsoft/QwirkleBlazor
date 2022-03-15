@@ -1,6 +1,6 @@
 ﻿namespace Qwirkle.WebApi.Shared;
 
-public class LoginParameters
+public class LoginModel
 {
     [Required]
     public string UserName { get; set; }

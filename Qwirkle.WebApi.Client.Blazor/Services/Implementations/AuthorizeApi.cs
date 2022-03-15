@@ -9,9 +9,9 @@ public class AuthorizeApi : IAuthorizeApi
         _httpClient = httpClient;
     }
 
-    public async Task Login(LoginParameters loginParameters)
+    public async Task Login(LoginModel loginModel)
     {
-        var result = await _httpClient.PostAsJsonAsync("User/Login", loginParameters);
+        var result = await _httpClient.PostAsJsonAsync("User/Login", loginModel);
         if (result.StatusCode == HttpStatusCode.BadRequest) throw new Exception(await result.Content.ReadAsStringAsync());
         result.EnsureSuccessStatusCode();
     }
@@ -22,9 +22,9 @@ public class AuthorizeApi : IAuthorizeApi
         result.EnsureSuccessStatusCode();
     }
 
-    public async Task Register(RegisterParameters registerParameters)
+    public async Task Register(RegisterModel registerModel)
     {
-        var result = await _httpClient.PostAsJsonAsync("User/Register", registerParameters);
+        var result = await _httpClient.PostAsJsonAsync("User/Register", registerModel);
         if (result.StatusCode == HttpStatusCode.BadRequest) throw new Exception(await result.Content.ReadAsStringAsync());
         result.EnsureSuccessStatusCode();
     }

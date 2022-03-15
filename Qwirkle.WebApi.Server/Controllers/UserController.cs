@@ -18,7 +18,7 @@ public class UserController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("Register")]
-    public async Task<ActionResult> RegisterAsync(RegisterParameters registerParameters) => IsAuthenticated() ? AlreadyAuthenticated() : new ObjectResult(await _userService.Register(registerParameters.ToUser(), registerParameters.Password));
+    public async Task<ActionResult> RegisterAsync(RegisterModel registerModel) => IsAuthenticated() ? AlreadyAuthenticated() : new ObjectResult(await _userService.Register(registerModel.ToUser(), registerModel.Password, registerModel.SignInPersistent));
 
 
     [AllowAnonymous]
@@ -28,7 +28,7 @@ public class UserController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("Login")]
-    public async Task<ActionResult> LoginAsync(LoginParameters login)
+    public async Task<ActionResult> LoginAsync(LoginModel login)
     {
         if (IsAuthenticated()) return AlreadyAuthenticated();
         var isGoodLogin = await _userService.LoginAsync(login.UserName, login.Password, login.RememberMe);

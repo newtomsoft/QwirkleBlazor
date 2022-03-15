@@ -1,6 +1,6 @@
 ﻿namespace Qwirkle.WebApi.Shared;
 
-public class SkipTurnModel
+public record SkipTurnModel
 {
-    public int GameId { get; set; }
+    public int GameId { get; init; }
 }

@@ -1,27 +1,24 @@
 ﻿@page "/login"
-@using Qwirkle.WebApi.Client.Blazor.Services.Implementations
 @layout LoginLayout
-@inject NavigationManager navigationManager
-@inject IdentityAuthenticationStateProvider authStateProvider
 
 <PageTitle>Login</PageTitle>
 
 <h1 class="h2 font-weight-normal login-title">Qwirkle</h1>
 
-<EditForm class="form-signin" OnValidSubmit="LoginAsUser" Model="LoginParameters">
+<EditForm class="form-signin" OnValidSubmit="LoginAsUser" Model="LoginModel">
     <DataAnnotationsValidator />
     <h4 class="font-weight-normal text-center">Login</h4>
 
     <label for="inputUsername" class="sr-only">User Name</label>
-    <InputText id="inputUsername" class="form-control" placeholder="Username" @bind-Value="LoginParameters.UserName" autofocus />
-    <ValidationMessage id="validationUserName" For="@(() => LoginParameters.UserName)" />
+    <InputText id="inputUsername" class="form-control" placeholder="Username" @bind-Value="LoginModel.UserName" autofocus />
+    <ValidationMessage id="validationUserName" For="@(() => LoginModel.UserName)" />
 
     <label for="inputPassword" class="sr-only">Password</label>
-    <InputText type="password" id="inputPassword" class="form-control" placeholder="Password" @bind-Value="LoginParameters.Password" />
-    <ValidationMessage id="validationPassword" For="@(() => LoginParameters.Password)" />
+    <InputText type="password" id="inputPassword" class="form-control" placeholder="Password" @bind-Value="LoginModel.Password" />
+    <ValidationMessage id="validationPassword" For="@(() => LoginModel.Password)" />
 
     <div class="form-check m-3">
-        <InputCheckbox id="inputRememberMe" class="form-check-input" @bind-Value="@LoginParameters.RememberMe" />
+        <InputCheckbox id="inputRememberMe" class="form-check-input" @bind-Value="@LoginModel.RememberMe" />
         <label class="form-check-label" for="inputRememberMe">Remember Me</label>
     </div>
 

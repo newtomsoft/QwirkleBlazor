@@ -1,20 +1,20 @@
 ﻿namespace Qwirkle.WebApi.Client.Blazor.Services.Implementations;
 
-class ActionApi : IActionApi
+public class ActionApi : IActionApi
 {
     private readonly HttpClient _httpClient;
-    private const string Controller = "Action";
+    private const string ControllerName = "Action";
     public ActionApi(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
 
-
-    public async Task PlayTiles(List<TileModel> tiles)
+    public async Task<PlayReturn> PlayTiles(List<TileModel> tiles)
     {
-        var result = await _httpClient.PostAsJsonAsync($"{Controller}/PlayTiles", tiles);
-        if (result.StatusCode == HttpStatusCode.BadRequest) throw new Exception(await result.Content.ReadAsStringAsync());
-        result.EnsureSuccessStatusCode();
+        var response = await _httpClient.PostAsJsonAsync($"{ControllerName}/PlayTiles", tiles);
+        if (response.StatusCode == HttpStatusCode.BadRequest) throw new Exception(await response.Content.ReadAsStringAsync());
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<PlayReturn>();
     }
 
     public Task PlayTilesSimulation(List<TileModel> tiles)
@@ -27,9 +27,12 @@ class ActionApi : IActionApi
         throw new NotImplementedException();
     }
 
-    public Task SkipTurn(SkipTurnModel skipTurnViewModel)
+    public async Task<SkipTurnReturn> SkipTurn(SkipTurnModel skipTurnModel)
     {
-        throw new NotImplementedException();
+        var response = await _httpClient.PostAsJsonAsync($"{ControllerName}/SkipTurn", skipTurnModel);
+        if (response.StatusCode == HttpStatusCode.BadRequest) throw new Exception(await response.Content.ReadAsStringAsync());
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<SkipTurnReturn>();
     }
 
     public Task ArrangeRack(List<TileModel> tiles)

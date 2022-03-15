@@ -1,8 +1,14 @@
 ﻿@page "/Game"
 @attribute [Authorize]
 
-@inject IActionApi _actionApi
-
 <h3>Game</h3>
 
+@{
+    var skipTurnModel = new SkipTurnModel {GameId = 1};
+}
 
+<button id="btnPlayTiles" class="btn btn-lg btn-primary btn-block" @onclick="@PlayTiles">Play tiles</button>
+<button id="btnSkipTurn" class="btn btn-lg btn-primary btn-block" @onclick="@(() => SkipTurn(skipTurnModel))">Skip turn</button>
+
+
+<h3 id="actionResult">@ActionResultString</h3>

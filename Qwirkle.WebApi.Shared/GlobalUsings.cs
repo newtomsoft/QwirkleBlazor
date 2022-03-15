@@ -3,3 +3,4 @@ global using Qwirkle.Domain.Enums;
 global using Qwirkle.Domain.ValueObjects;
 global using System.Collections.Generic;
 global using System.ComponentModel.DataAnnotations;
+global using Qwirkle.Domain.Services;
