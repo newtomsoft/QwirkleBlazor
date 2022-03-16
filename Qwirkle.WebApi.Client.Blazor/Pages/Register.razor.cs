@@ -1,6 +1,4 @@
-﻿using Qwirkle.Domain.Services;
-
-namespace Qwirkle.WebApi.Client.Blazor.Pages;
+﻿namespace Qwirkle.WebApi.Client.Blazor.Pages;
 
 public partial class Register
 {
@@ -15,7 +13,7 @@ public partial class Register
         try
         {
             await AuthStateProvider!.Register(RegisterModel);
-            NavigationManager!.NavigateTo(Constant.PageHome);
+            NavigationManager!.NavigateTo(Page.Home);
         }
         catch (Exception ex)
         {
@@ -26,6 +24,6 @@ public partial class Register
     private async Task LoginAsGuest()
     {
         await AuthStateProvider!.RegisterGuest();
-        NavigationManager!.NavigateTo(Constant.PageInstantGame);
+        NavigationManager!.NavigateTo(Page.InstantGame);
     }
 }

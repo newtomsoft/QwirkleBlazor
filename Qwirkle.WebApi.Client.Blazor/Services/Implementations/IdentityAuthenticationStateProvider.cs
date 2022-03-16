@@ -3,34 +3,34 @@
 public class IdentityAuthenticationStateProvider : AuthenticationStateProvider
 {
     private UserInfo? _userInfoCache;
-    private readonly IAuthorizeApi _authorizeApi;
+    private readonly IUserApi _userApi;
 
-    public IdentityAuthenticationStateProvider(IAuthorizeApi authorizeApi)
+    public IdentityAuthenticationStateProvider(IUserApi userApi)
     {
-        _authorizeApi = authorizeApi;
+        _userApi = userApi;
     }
 
     public async Task Login(LoginModel loginModel)
     {
-        await _authorizeApi.Login(loginModel);
+        await _userApi.Login(loginModel);
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
     public async Task Register(RegisterModel registerModel)
     {
-        await _authorizeApi.Register(registerModel);
+        await _userApi.Register(registerModel);
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
     public async Task RegisterGuest()
     {
-        await _authorizeApi.RegisterGuest();
+        await _userApi.RegisterGuest();
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 
     public async Task Logout()
     {
-        await _authorizeApi.Logout();
+        await _userApi.Logout();
         _userInfoCache = null;
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
@@ -57,7 +57,7 @@ public class IdentityAuthenticationStateProvider : AuthenticationStateProvider
     private async Task<UserInfo?> GetUserInfo()
     {
         if (_userInfoCache is { IsAuthenticated: true }) return _userInfoCache;
-        _userInfoCache = await _authorizeApi.GetUserInfo();
+        _userInfoCache = await _userApi.GetUserInfo();
         return _userInfoCache;
     }
 }

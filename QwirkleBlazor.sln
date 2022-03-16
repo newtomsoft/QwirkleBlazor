@@ -38,7 +38,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infra", "Infra", "{04F400B7
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApi", "WebApi", "{9658BC42-BDB1-4B10-AADE-1AF4DEA5D18B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Evaluation", "Evaluation", "{BD80B127-69C3-4393-A3AA-2310354B9F97}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bot Evaluation", "Bot Evaluation", "{BD80B127-69C3-4393-A3AA-2310354B9F97}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Qwirkle.WebApi.Client.Blazor.Tests", "Qwirkle.WebApi.Client.Blazor.Tests\Qwirkle.WebApi.Client.Blazor.Tests.csproj", "{3E41420F-B151-44FF-892C-8F2F0B9ED4EF}"
 	ProjectSection(ProjectDependencies) = postProject

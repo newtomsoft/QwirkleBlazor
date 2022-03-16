@@ -1,7 +1,7 @@
-﻿namespace Qwirkle.WebApi.Server.Controllers;
+﻿namespace Qwirkle.Web.Api.Controllers;
 
 [ApiController]
-//[Authorize]
+[Authorize]
 [Route("Game")]
 public class GameController : ControllerBase
 {
@@ -19,17 +19,17 @@ public class GameController : ControllerBase
         _userManager = userManager;
     }
 
+
     [HttpPost("New")]
-    public async Task<ActionResult> CreateGameAsync(OpponentsModel opponentsModel)
+    public ActionResult CreateGame(HashSet<string> usersNames)
     {
-        var opponentsNames = new HashSet<string> { opponentsModel.Opponent1, opponentsModel.Opponent2, opponentsModel.Opponent3 };
         var usersIdsList = new List<int> { UserId };
-        usersIdsList.AddRange(opponentsNames.Select(opponentName => _infoService.GetUserId(opponentName)));
+        usersIdsList.AddRange(usersNames.Select(userName => _infoService.GetUserId(userName)));
         usersIdsList.RemoveAll(id => id == 0);
         var usersIds = new HashSet<int>(usersIdsList);
-        if (!usersIds.Contains(UserId)) return new BadRequestObjectResult("user not in the game");
-        var gameId = await _coreService.CreateGameAsync(usersIds);
-        return new ObjectResult(gameId);
+        if (!usersIds.Contains(UserId)) return BadRequest("user not in the game");
+        var gameId = _coreService.CreateGameWithUsersIds(usersIds);
+        return Ok(gameId);
     }
 
 
@@ -37,10 +37,10 @@ public class GameController : ControllerBase
     public ActionResult GetGame(int gameId)
     {
         var game = _infoService.GetGameWithTilesOnlyForAuthenticatedUser(gameId, UserId);
-        return game is null ? StatusCode(StatusCodes.Status404NotFound) : new ObjectResult(game);
+        return game is null ? BadRequest() : Ok(game);
     }
 
 
     [HttpGet("UserGamesIds")]
-    public ActionResult GetUserGamesIds() => new ObjectResult(_infoService.GetUserGames(UserId));
+    public ActionResult GetUserGamesIds() => Ok(_infoService.GetUserGames(UserId));
 }

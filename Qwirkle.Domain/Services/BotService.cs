@@ -4,57 +4,40 @@ public class BotService
 {
     private readonly InfoService _infoService;
     private readonly CoreService _coreService;
-    private readonly UserService _userService;
     private readonly ILogger<CoreService> _logger;
 
-    public BotService(InfoService infoService, CoreService coreService, UserService userService, ILogger<CoreService> logger)
+    public BotService(InfoService infoService, CoreService coreService, ILogger<CoreService> logger)
     {
         _infoService = infoService;
         _coreService = coreService;
-        _userService = userService;
         _logger = logger;
     }
 
-    public async Task PlayBotsAsync(int gameId)
+    public void Play(Game game, Player bot)
     {
-        var isPlayed = true;
-        while (isPlayed)
-        {
-            var game = await _infoService.GetGameAsync(gameId);
-            var player = game.Players.First(p => p.IsTurn);
-            isPlayed = Play(game, player);
-        }
-    }
-
-    private bool Play(Game game, Player player)
-    {
-        if (_userService.IsBot(player.UserId) is false || game.GameOver) return false;
-
-        var tilesToPlay = GetBestMove(player, game).Tiles.ToList();
+        var tilesToPlay = GetBestMove(bot, game).Tiles.ToList();
         if (tilesToPlay.Count > 0)
         {
             _logger?.LogInformation($"Bot play {tilesToPlay.ToLog()}");
-            _coreService.TryPlayTiles(player.Id, tilesToPlay);
+            _coreService.TryPlayTiles(bot.Id, tilesToPlay);
         }
         else
         {
             _logger?.LogInformation("Bot swap or skip...");
-            SwapOrSkipTurn(player, game.Bag.Tiles.Count);
+            SwapOrSkipTurn(bot, game.Bag.Tiles.Count);
         }
-
-        return true;
     }
 
     public int GetMostPointsToPlay(Player player, Game game, Coordinates originCoordinates = null)
     {
-        var doableMoves = ComputeDoableMoves(player, game, originCoordinates);
+        var doableMoves = ComputeDoableMoves(player, game, originCoordinates, true);
         var playReturn = doableMoves.OrderByDescending(m => m.Move.Points).FirstOrDefault();
         return playReturn?.Move.Points ?? 0;
     }
 
     public Move GetBestMove(Player player, Game game, Coordinates originCoordinates = null)
     {
-        var moves = ComputeDoableMoves(player, game, originCoordinates).Select(r => r.Move).OrderByDescending(m => m.Points).ToList();
+        var moves = ComputeDoableMoves(player, game, originCoordinates, true).Select(r => r.Move).OrderByDescending(m => m.Points).ToList();
 
         if (moves.Count == 0) return Move.Empty;
 
@@ -80,8 +63,10 @@ public class BotService
         return ComputeDoableMoves(player, game);
     }
 
-    private HashSet<PlayReturn> ComputeDoableMoves(Player player, Game game, Coordinates originCoordinates = null)
+    private HashSet<PlayReturn> ComputeDoableMoves(Player player, Game game, Coordinates originCoordinates = null, bool simulation = false)
     {
+        if (!simulation) _coreService.ResetGame(player.GameId);
+
         var rack = player.Rack.WithoutDuplicatesTiles();
         var boardAdjoiningCoordinates = game.Board.GetFreeAdjoiningCoordinatesToTiles(originCoordinates);
         var with1TilePlayReturns = new HashSet<PlayReturn>();

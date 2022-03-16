@@ -9,6 +9,7 @@ global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using Qwirkle.Authentication.Adapters;
+global using Qwirkle.Domain.Entities;
 global using Qwirkle.Domain.Enums;
 global using Qwirkle.Domain.Ports;
 global using Qwirkle.Domain.Services;

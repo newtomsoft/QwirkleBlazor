@@ -2,6 +2,8 @@
 
 public record Tile(TileColor Color, TileShape Shape) : IComparable
 {
+    public Tile() : this(TileColor.Blue, TileShape.Circle) { } //TODO verify
+
     protected Tile(Tile tile) => (Color, Shape) = tile;
 
     public bool OnlyShapeOrColorEqual(Tile tile) => Color == tile.Color && Shape != tile.Shape || Color != tile.Color && Shape == tile.Shape;

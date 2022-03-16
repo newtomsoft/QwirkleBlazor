@@ -14,6 +14,8 @@ public record Player
     public bool LastTurnSkipped { get; set; }
     public User User { get; }
 
+    public Player() { }
+
     public Player(int id, int userId, int gameId, string pseudo, int gamePosition, int points, int lastTurnPoints, Rack rack, bool isTurn, bool lastTurnSkipped, User user = default)
     {
         Id = id;

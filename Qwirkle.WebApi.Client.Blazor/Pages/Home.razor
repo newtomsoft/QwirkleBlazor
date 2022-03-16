@@ -1,0 +1,44 @@
+﻿@page "/"
+@page "/Home"
+@attribute [Authorize]
+
+<PageTitle>Index</PageTitle>
+<AuthorizeView>
+    <Authorized>
+        <h1>Hello @context.User.Identity!.Name</h1>
+
+        <p>Welcome to Qwirkle.</p>
+
+
+        <div class="form-signin">
+            <button id="btnGetGamesIds" class="btn btn-lg btn-primary btn-block" @onclick="@GetGames">My games</button>
+        </div>
+        
+        @if (Games.Any())
+        {
+            @foreach (var game in Games)
+            {
+                <p>@game.Id  -  bag :@game.Bag.TilesNumber tiles - board: @game.Board.Tiles.Count tiles - players:@game.Players.Count</p>
+                @foreach (var player in game.Players)
+                {
+                    <p>player: @player.Id name:@player.Pseudo</p>
+                }
+            }
+        }
+        
+        
+        <div class="form-signin">
+            <button id="btnGetGame" class="btn btn-lg btn-primary btn-block" @onclick="@GetGame">Game 161</button>
+        </div>
+    @if (Game is not null)
+    {
+        <p>@Game.Id - bag :@Game.Bag.TilesNumber tiles - board: @Game.Board.Tiles.Count tiles - players:@Game.Players.Count</p>
+        @foreach (var player in Game.Players)
+        {
+            <p>player: @player.Id name:@player.Pseudo</p>
+        }
+    }
+
+    </Authorized>
+
+</AuthorizeView>

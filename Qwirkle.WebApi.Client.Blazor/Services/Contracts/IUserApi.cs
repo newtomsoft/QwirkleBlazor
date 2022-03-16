@@ -1,6 +1,6 @@
 ﻿namespace Qwirkle.WebApi.Client.Blazor.Services.Contracts;
 
-public interface IAuthorizeApi
+public interface IUserApi
 {
     Task Login(LoginModel loginModel);
     Task Register(RegisterModel registerModel);

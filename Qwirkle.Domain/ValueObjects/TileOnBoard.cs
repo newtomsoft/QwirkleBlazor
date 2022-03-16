@@ -10,6 +10,8 @@ public record TileOnBoard(Tile Tile, Coordinates Coordinates) : Tile(Tile)
     public static TileOnBoard From(TileShape shape, TileColor color, Abscissa x, Ordinate y) => new(new Tile(color, shape), Coordinates.From(x, y));
     private TileOnBoard(TileOnPlayer tileOnPlayer, Coordinates coordinates) : this(tileOnPlayer.ToTile(), coordinates) { }
 
+    public TileOnBoard() : this(new Tile(), Coordinates.From(0, 0)) { }
+
     public Tile ToTile() => new(Color, Shape);
 
     public override string ToString() => $"{Tile} on {Coordinates}";

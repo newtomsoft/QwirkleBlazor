@@ -1,10 +1,12 @@
 ﻿namespace Qwirkle.WebApi.Client.Blazor.Pages;
 
-public partial class Game
+public partial class GameComponent
 {
     [Inject] private IActionApi ActionApi { get; set; }
 
     private string ActionResultString { get; set; } = string.Empty;
+
+    [Parameter] public string GameId { get; set; }
 
     private async Task PlayTiles()
     {

@@ -18,7 +18,7 @@ public class GameTests
         authContext.SetAuthorized("newtom");
 
         testContext.Services.AddSingleton(actionApi);
-        var gameComponent = testContext.RenderComponent<Game>();
+        var gameComponent = testContext.RenderComponent<GameComponent>();
 
         gameComponent.Find("#actionResult").Text().ShouldBe(string.Empty);
 

@@ -14,7 +14,7 @@ public partial class Login
         try
         {
             await AuthStateProvider.Login(LoginModel);
-            NavigationManager.NavigateTo(Constant.PageHome);
+            NavigationManager.NavigateTo(Page.Home);
         }
         catch (Exception ex)
         {
@@ -25,7 +25,7 @@ public partial class Login
     private async Task LoginAsGuest()
     {
         await AuthStateProvider.RegisterGuest();
-        NavigationManager.NavigateTo(Constant.PageInstantGame);
+        NavigationManager.NavigateTo(Page.InstantGame);
     }
 }
 
