@@ -1,6 +1,6 @@
 ﻿namespace Qwirkle.WebApi.Client.Blazor.Pages;
 
-public partial class Login
+public partial class LoginComponent
 {
     [Inject] private NavigationManager NavigationManager { get; set; }
     [Inject] private IdentityAuthenticationStateProvider AuthStateProvider { get; set; }

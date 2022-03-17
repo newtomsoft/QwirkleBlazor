@@ -1,37 +1,5 @@
 ﻿namespace Qwirkle.WebApi.Client.Blazor.Tests.Arrange;
 
-public static class ComponentFactory<T, TU> where T : ComponentBase where TU : class
-{
-    public static IRenderedComponent<T> RenderComponent(TU api, out FakeNavigationManager fakeNavigationManager)
-    {
-        (var renderedComponent, fakeNavigationManager) = RenderComponentWithNavigationManager(api);
-        return renderedComponent;
-    }
-
-    public static IRenderedComponent<T> RenderComponent(TU api)
-    {
-        var (renderedComponent, _) = RenderComponentWithNavigationManager(api);
-        return renderedComponent;
-    }
-
-    private static (IRenderedComponent<T>, FakeNavigationManager) RenderComponentWithNavigationManager(TU api)
-    {
-        var context = new TestContext();
-        context.Services.AddSingleton(api);
-        context.AddTestAuthorization().SetAuthorized("userName");
-        var notificationMock = new Mock<INotification>();
-        context.Services.AddSingleton(notificationMock.Object);
-
-        var userApi = new Mock<IUserApi>();
-        context.Services.AddSingleton(userApi.Object);
-        var identityAuthenticationStateProvider = new Mock<IdentityAuthenticationStateProvider>(userApi.Object);
-        context.Services.AddSingleton(identityAuthenticationStateProvider.Object);
-        var navigationManager = context.Services.GetRequiredService<FakeNavigationManager>();
-        var component = context.RenderComponent<T>();
-        return (component, navigationManager);
-    }
-}
-
 public static class ComponentFactory<T> where T : ComponentBase
 {
     public static IRenderedComponent<T> RenderComponent(bool isAuthorized)
@@ -47,6 +15,12 @@ public static class ComponentFactory<T> where T : ComponentBase
         return renderedComponent;
     }
 
+    public static IRenderedComponent<T> RenderComponent<TU>(TU api, out FakeNavigationManager fakeNavigationManager) where TU : class
+    {
+        (var renderedComponent, fakeNavigationManager) = RenderComponentWithNavigationManager(api);
+        return renderedComponent;
+    }
+    
     private static (IRenderedComponent<T>, FakeNavigationManager) RenderComponentWithNavigationManager(bool isAuthorized)
     {
         var context = new TestContext();
@@ -58,6 +32,21 @@ public static class ComponentFactory<T> where T : ComponentBase
         context.Services.AddSingleton(identityAuthenticationStateProvider.Object);
         var navigationManager = context.Services.GetRequiredService<FakeNavigationManager>();
         
+        var component = context.RenderComponent<T>();
+        return (component, navigationManager);
+    }
+
+    private static (IRenderedComponent<T>, FakeNavigationManager) RenderComponentWithNavigationManager<TU>(TU serviceInstance) where TU : class
+    {
+        var context = new TestContext();
+        context.Services.AddSingleton(serviceInstance);
+        context.AddTestAuthorization().SetAuthorized("userName");
+        context.Services.AddSingleton(new Mock<INotificationService>().Object);
+        var userApi = new Mock<IUserApi>();
+        context.Services.AddSingleton(userApi.Object);
+        var identityAuthenticationStateProvider = new Mock<IdentityAuthenticationStateProvider>(userApi.Object);
+        context.Services.AddSingleton(identityAuthenticationStateProvider.Object);
+        var navigationManager = context.Services.GetRequiredService<FakeNavigationManager>();
         var component = context.RenderComponent<T>();
         return (component, navigationManager);
     }

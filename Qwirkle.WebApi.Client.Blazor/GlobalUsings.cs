@@ -14,3 +14,4 @@ global using System.Net.Http.Json;
 global using System.Security.Claims;
 global using System.Diagnostics;
 global using Microsoft.AspNetCore.SignalR.Client;
+global using Qwirkle.Domain.Ports;

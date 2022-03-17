@@ -2,6 +2,9 @@
 
 public interface INotification
 {
+    const string ReceiveInstantGameJoined = "ReceiveInstantGameExpected";
+    const string ReceiveInstantGameStarted = "ReceiveInstantGameStarted";
+
     void SendTurnSkipped(int gameId, int playerId);
     void SendPlayerIdTurn(int gameId, int playerId);
     void SendTilesPlayed(int gameId, int playerId, Move move);

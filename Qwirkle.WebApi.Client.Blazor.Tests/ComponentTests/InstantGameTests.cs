@@ -9,7 +9,7 @@ public class InstantGameTests
         var instantGameApi = new Mock<IInstantGameApi>();
         var modelGameStartedTask = Task.FromResult(new InstantGameModel { GameId = gameId, UsersNames = new[] { "player1", "player2", "player3", "player4" } });
         instantGameApi.Setup(x => x.JoinInstantGame(2)).Returns(modelGameStartedTask);
-        var instantGameComponent = ComponentFactory<InstantGameComponent, IInstantGameApi>.RenderComponent(instantGameApi.Object, out var navigationManager);
+        var instantGameComponent = ComponentFactory<InstantGameComponent>.RenderComponent(instantGameApi.Object, out var navigationManager);
         instantGameComponent.Find("#btn2Players").Click();
 
         var newUri = new Uri(navigationManager.Uri);
@@ -22,7 +22,7 @@ public class InstantGameTests
         var instantGameApi = new Mock<IInstantGameApi>();
         var modelGameWaitingTask = Task.FromResult(new InstantGameModel { GameId = 0, UsersNames = new[] { "player1" } });
         instantGameApi.Setup(x => x.JoinInstantGame(2)).Returns(modelGameWaitingTask);
-        var instantGameComponent = ComponentFactory<InstantGameComponent, IInstantGameApi>.RenderComponent(instantGameApi.Object, out var navigationManager);
+        var instantGameComponent = ComponentFactory<InstantGameComponent>.RenderComponent(instantGameApi.Object, out var navigationManager);
         instantGameComponent.Find("#btn2Players").Click();
 
         var markup = instantGameComponent.Markup;
@@ -37,7 +37,7 @@ public class InstantGameTests
         var instantGameApi = new Mock<IInstantGameApi>();
         var modelGameWaitingTask = Task.FromResult(new InstantGameModel { GameId = 0, UsersNames = new[] { "player1" } });
         instantGameApi.Setup(x => x.JoinInstantGame(3)).Returns(modelGameWaitingTask);
-        var instantGameComponent = ComponentFactory<InstantGameComponent, IInstantGameApi>.RenderComponent(instantGameApi.Object, out var navigationManager);
+        var instantGameComponent = ComponentFactory<InstantGameComponent>.RenderComponent(instantGameApi.Object, out var navigationManager);
         instantGameComponent.Find("#btn3Players").Click();
 
         var markup = instantGameComponent.Markup;

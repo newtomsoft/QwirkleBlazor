@@ -1,11 +1,12 @@
 ﻿namespace Qwirkle.WebApi.Client.Blazor.Tests.ComponentTests;
-public class GameTests
+
+public class GameComponentTests
 {
     [Fact]
-    public async Task SkipTurnTest()
+    public void SkipTurnTest()
     {
-        var gameId = 1;
-        var returnCode = ReturnCode.Ok;
+        const int gameId = 1;
+        const ReturnCode returnCode = ReturnCode.Ok;
         var skipTurnModel = new SkipTurnModel { GameId = gameId };
         var skipTurnReturnTask = Task.FromResult(new SkipTurnReturn { GameId = gameId, Code = returnCode });
 

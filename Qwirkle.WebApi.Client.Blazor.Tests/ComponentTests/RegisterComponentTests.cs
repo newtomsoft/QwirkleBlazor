@@ -1,6 +1,6 @@
 ﻿namespace Qwirkle.WebApi.Client.Blazor.Tests.ComponentTests;
 
-public class RegisterTests
+public class RegisterComponentTests
 {
     public static TheoryData<RegisterTestsInput> RegisterNewType => new()
     {
@@ -17,7 +17,7 @@ public class RegisterTests
     [MemberData(nameof(RegisterNewType))]
     public void Register(RegisterTestsInput input)
     {
-        var loginComponent = ComponentFactory<Register>.RenderComponent(false, out var navigationManager);
+        var loginComponent = ComponentFactory<RegisterComponent>.RenderComponent(false, out var navigationManager);
         loginComponent.Find("#inputUsername").Change(input.RegisterModel.UserName);
         loginComponent.Find("#inputEmail").Change(input.RegisterModel.Email);
         loginComponent.Find("#inputPassword").Change(input.RegisterModel.Password);

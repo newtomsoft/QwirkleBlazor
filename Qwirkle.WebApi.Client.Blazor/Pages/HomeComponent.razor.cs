@@ -1,6 +1,6 @@
 ﻿namespace Qwirkle.WebApi.Client.Blazor.Pages;
 
-public partial class Home
+public partial class HomeComponent
 {
     [Inject] private IGameApi GameApi { get; set; }
 

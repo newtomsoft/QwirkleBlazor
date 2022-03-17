@@ -1,11 +1,11 @@
 namespace Qwirkle.WebApi.Client.Blazor.Tests.ComponentTests;
 
-public class LoginTests
+public class LoginComponentTests
 {
     [Fact]
     public void LoginWithoutLoginAndPassword()
     {
-        var loginComponent = ComponentFactory<Login>.RenderComponent(false);
+        var loginComponent = ComponentFactory<LoginComponent>.RenderComponent(false);
         loginComponent.Find("#btnSignIn").Click();
 
         loginComponent.Find("#validationUserName").Text().ShouldNotBe("");
@@ -16,7 +16,7 @@ public class LoginTests
     [Fact]
     public void LoginAsRegisteredUser()
     {
-        var loginComponent = ComponentFactory<Login>.RenderComponent(false, out var navigationManager);
+        var loginComponent = ComponentFactory<LoginComponent>.RenderComponent(false, out var navigationManager);
         loginComponent.Find("#inputUsername").Change("userTest");
         loginComponent.Find("#inputPassword").Change("passwordTest");
         loginComponent.Find("#btnSignIn").Click();
@@ -29,7 +29,7 @@ public class LoginTests
     [Fact]
     public void LoginAsGuestShouldRedirectToInstantGame()
     {
-        var loginComponent = ComponentFactory<Login>.RenderComponent(false, out var navigationManager);
+        var loginComponent = ComponentFactory<LoginComponent>.RenderComponent(false, out var navigationManager);
         loginComponent.Find("#btnLoginAsGuest").Click();
 
         var newUri = new Uri(navigationManager.Uri);
