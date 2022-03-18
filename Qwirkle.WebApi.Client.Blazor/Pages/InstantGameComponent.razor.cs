@@ -45,6 +45,6 @@ public partial class InstantGameComponent : IAsyncDisposable
         _playersNames.Add(userName);
         StateHasChanged();
     }
-    
+
     public async ValueTask DisposeAsync() => await InstantGameNotificationService.DisposeAsync();
 }

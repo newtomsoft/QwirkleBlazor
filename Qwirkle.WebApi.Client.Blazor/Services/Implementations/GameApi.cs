@@ -14,7 +14,7 @@ public class GameApi : BaseApi, IGameApi
         return await response.Content.ReadFromJsonAsync<List<int>>();
     }
 
-    public async Task<Game> GetUserGame(int gameId)
+    public async Task<Game> GetGame(int gameId)
     {
         var response = await _httpClient.GetAsync($"{ControllerName}/{gameId}");
         if (response.StatusCode == HttpStatusCode.BadRequest) throw new Exception(await response.Content.ReadAsStringAsync());

@@ -15,7 +15,7 @@ builder.Services.AddSingleton<IActionApi, ActionApi>();
 builder.Services.AddSingleton<IGameApi, GameApi>();
 builder.Services.AddSingleton<IPlayerApi, PlayerApi>();
 builder.Services.AddSingleton<IInstantGameApi, InstantGameApi>();
-builder.Services.AddSingleton<IInstantGameNotificationService, InstantGameNotificationService>();
-builder.Services.AddSingleton<IGameNotificationService, GameNotificationService>();
+builder.Services.AddSingleton<IInstantGameNotificationService, InstantGameSignalRService>();
+builder.Services.AddSingleton<IGameNotificationService, GameSignalRService>();
 
 await builder.Build().RunAsync();

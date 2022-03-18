@@ -4,7 +4,7 @@ public class InstantGameApi : BaseApi, IInstantGameApi
 {
     protected override string ControllerName => "InstantGame";
 
-    public InstantGameApi(HttpClient httpClient) :base(httpClient) { }
+    public InstantGameApi(HttpClient httpClient) : base(httpClient) { }
 
     public async Task<InstantGameModel> JoinInstantGame(int playersNumber)
     {

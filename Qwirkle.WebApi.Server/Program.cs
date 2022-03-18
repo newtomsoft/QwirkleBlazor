@@ -1,16 +1,10 @@
-﻿using Microsoft.AspNetCore.ResponseCompression;
-
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 var cors = new Cors();
 builder.Configuration.GetSection("Cors").Bind(cors);
 builder.Host.UseSerilog((_, configuration) => configuration.ReadFrom.Configuration(builder.Configuration));
 builder.Services.AddDbContext<DefaultDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Qwirkle")));
 builder.Services.AddSignalR();
-builder.Services.AddResponseCompression(opts =>
-{
-    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-        new[] { "application/octet-stream" });
-});
+builder.Services.AddResponseCompression(opts => opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" }));
 builder.Services.AddSingleton<INotification, SignalRNotification>();
 builder.Services.AddSingleton<InstantGameService>();
 builder.Services.AddScoped<IRepository, Repository>();
@@ -28,6 +22,7 @@ builder.Services.AddSession();
 
 var app = builder.Build();
 
+app.UseQwirkleCors();
 app.UseResponseCompression();
 
 if (app.Environment.IsDevelopment()) app.UseWebAssemblyDebugging();
@@ -40,11 +35,10 @@ app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseQwirkleCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
-app.UseEndpoints(endpoints => { endpoints.MapControllers(); endpoints.MapHub<HubQwirkle>("/hubGame"); });
+app.UseEndpoints(endpoints => { endpoints.MapControllers(); endpoints.MapHub<SignalRHub>("/hubGame"); });
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 

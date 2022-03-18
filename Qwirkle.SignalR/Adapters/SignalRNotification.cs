@@ -2,9 +2,9 @@
 
 public class SignalRNotification : INotification
 {
-    private readonly IHubContext<HubQwirkle> _hubContextQwirkle;
+    private readonly IHubContext<SignalRHub> _hubContextQwirkle;
 
-    public SignalRNotification(IHubContext<HubQwirkle> hubContextQwirkle)
+    public SignalRNotification(IHubContext<SignalRHub> hubContextQwirkle)
     {
         _hubContextQwirkle = hubContextQwirkle;
     }
@@ -16,6 +16,6 @@ public class SignalRNotification : INotification
     public void SendTilesSwapped(int gameId, int playerId) => _hubContextQwirkle.Clients.Group(gameId.ToString()).SendAsync(INotification.ReceiveTilesSwapped, playerId);
     public void SendGameOver(int gameId, List<int> winnersPlayersIds) => _hubContextQwirkle.Clients.Group(gameId.ToString()).SendAsync(INotification.ReceiveGameOver, winnersPlayersIds);
 
-    public void SendInstantGameStarted(int playersNumberForStartGame, int gameId) => _hubContextQwirkle.Clients.Group(HubQwirkle.InstantGameGroupName(playersNumberForStartGame)).SendAsync(INotification.ReceiveInstantGameStarted, playersNumberForStartGame, gameId);
-    public void SendInstantGameJoined(int playersNumberForStartGame, string userName) => _hubContextQwirkle.Clients.Group(HubQwirkle.InstantGameGroupName(playersNumberForStartGame)).SendAsync(INotification.ReceiveInstantGameJoined, userName);
+    public void SendInstantGameStarted(int playersNumberForStartGame, int gameId) => _hubContextQwirkle.Clients.Group(SignalRHub.InstantGameGroupName(playersNumberForStartGame)).SendAsync(INotification.ReceiveInstantGameStarted, playersNumberForStartGame, gameId);
+    public void SendInstantGameJoined(int playersNumberForStartGame, string userName) => _hubContextQwirkle.Clients.Group(SignalRHub.InstantGameGroupName(playersNumberForStartGame)).SendAsync(INotification.ReceiveInstantGameJoined, userName);
 }

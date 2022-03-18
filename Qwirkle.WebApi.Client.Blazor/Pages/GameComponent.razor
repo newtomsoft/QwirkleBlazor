@@ -1,16 +1,10 @@
-﻿@page "/Game/{GameIdString}"
-@page "/Game"
+﻿@page "/Game/{GameId:int}"
 @attribute [Authorize]
 
 <h3>Game</h3>
 
-
-@{
-    var skipTurnModel = new SkipTurnModel { GameId = 1 };
-}
-
 <button id="btnPlayTiles" class="btn btn-lg btn-primary btn-block" @onclick="@PlayTiles">Play tiles</button>
-<button id="btnSkipTurn" class="btn btn-lg btn-primary btn-block" @onclick="@(() => SkipTurn(skipTurnModel))">Skip turn</button>
+<button id="btnSkipTurn" class="btn btn-lg btn-primary btn-block" @onclick="@(() => SkipTurn(new SkipTurnModel { GameId = GameId }))">Skip turn</button>
 
 <h3 id="actionResult">@ActionResultString</h3>
 
@@ -18,15 +12,31 @@
 @if (Game is not null)
 {
     <p>@Game.Id - bag :@Game.Bag.TilesNumber tiles - board: @Game.Board.Tiles.Count tiles - players:@Game.Players.Count</p>
-    @foreach (var tile in Game.Board.Tiles)
-    {
-        <p>@tile.Shape @tile.Color @tile.Coordinates</p>
-    }
     <div>
         Rack :
-        @foreach (var tile in Game.Players.First(p => p.Id == Player.Id).Rack.Tiles)
+        @foreach (var (rackPosition, tileColor, tileShape) in Game.Players.First(p => p.Id == Player.Id).Rack.Tiles)
         {
-            <p>@tile.RackPosition @tile.Shape @tile.Color</p>
+            <p>@rackPosition @tileShape @tileColor</p>
         }
     </div>
+}
+
+@if (Game is not null)
+{
+    <table>
+        @for (var y = _boardLimit.MinY; y <= _boardLimit.MaxY; y++)
+        {
+            <tr>
+                @for (var x = _boardLimit.MinX; x <= _boardLimit.MaxX; x++)
+                {
+                    <td style="width: 4rem; height: 4rem; border: 1px solid;">
+                        @{
+                            var tile = Game.Board.Tiles.FirstOrDefault(t => t.Coordinates == Coordinates.From(x, y));
+                        }
+                        @tile?.Shape.ToString()[0] @tile?.Color.ToString()[0]
+                    </td>
+                }
+            </tr>
+        }
+    </table>
 }

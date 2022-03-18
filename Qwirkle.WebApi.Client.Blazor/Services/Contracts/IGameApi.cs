@@ -3,5 +3,5 @@
 public interface IGameApi
 {
     Task<List<int>> GetUserGamesIds();
-    Task<Game> GetUserGame(int gameId);
+    Task<Game> GetGame(int gameId);
 }

@@ -15,7 +15,7 @@ public partial class HomeComponent
         var gamesIds = await GameApi.GetUserGamesIds();
         foreach (var gameId in gamesIds)
         {
-            Games.Add(await GameApi.GetUserGame(gameId));
+            Games.Add(await GameApi.GetGame(gameId));
         }
     }
 

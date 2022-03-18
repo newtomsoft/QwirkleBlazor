@@ -1,12 +1,12 @@
 ﻿namespace Qwirkle.SignalR;
 
-public class HubQwirkle : Hub
+public class SignalRHub : Hub
 {
-    private static readonly Dictionary<int, List<Player>> GameIdWithPlayers = new();
+    private static readonly Dictionary<int, List<SignalRPlayer>> GameIdWithPlayers = new();
     private static readonly Dictionary<int, HashSet<NotificationUser>> InstantGameWaitingUsers = new();
 
 
-    public HubQwirkle()
+    public SignalRHub()
     {
         InstantGameWaitingUsers.TryAdd(2, new HashSet<NotificationUser>());
         InstantGameWaitingUsers.TryAdd(3, new HashSet<NotificationUser>());
@@ -36,8 +36,8 @@ public class HubQwirkle : Hub
 
     public async Task PlayerInGame(int gameId, int playerId)
     {
-        GameIdWithPlayers.TryAdd(gameId, new List<Player>());
-        var player = new Player(Context.ConnectionId, playerId);
+        GameIdWithPlayers.TryAdd(gameId, new List<SignalRPlayer>());
+        var player = new SignalRPlayer(Context.ConnectionId, playerId);
         var playerInGame = GameIdWithPlayers[gameId].Any(p => p.PlayerId == playerId);
         if (!playerInGame)
         {
@@ -59,7 +59,7 @@ public class HubQwirkle : Hub
         }
     }
 
-    private Task SendPlayersInGame(int gameId) => Clients.Group(gameId.ToString()).SendAsync("ReceivePlayersInGame", GameIdWithPlayers[gameId]);
-    private Task SendUserWaitingInstantGame(int instantGamePlayerNumber) => Clients.Group(InstantGameGroupName(instantGamePlayerNumber)).SendAsync("ReceiveUsersWaitingInstantGame", InstantGameWaitingUsers[instantGamePlayerNumber]);
+    private Task SendPlayersInGame(int gameId) => Clients.Group(gameId.ToString()).SendAsync(INotification.ReceivePlayersInGame, GameIdWithPlayers[gameId].Select(item => item.PlayerId).ToHashSet());
+    private Task SendUserWaitingInstantGame(int instantGamePlayerNumber) => Clients.Group(InstantGameGroupName(instantGamePlayerNumber)).SendAsync(INotification.ReceiveUsersWaitingInstantGame, InstantGameWaitingUsers[instantGamePlayerNumber]);
     public static string InstantGameGroupName(int playerNumberForStartGame) => "instantGame" + playerNumberForStartGame;
 }

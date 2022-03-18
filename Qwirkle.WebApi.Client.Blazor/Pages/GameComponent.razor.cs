@@ -1,44 +1,46 @@
 ﻿namespace Qwirkle.WebApi.Client.Blazor.Pages;
 
-public partial class GameComponent
+public partial class GameComponent : IAsyncDisposable
 {
-    [Inject] private IActionApi ActionApi { get; set; }
-    [Inject] private IGameApi GameApi { get; set; }
-    [Inject] private IPlayerApi PlayerApi { get; set; }
-    [Inject] private IGameNotificationService GameNotificationService { get; set; }
-    [Inject] private NavigationManager NavigationManager { get; set; }
-    [Parameter] public string GameIdString { get; set; }
-    private int GameId => int.Parse(GameIdString); //Todo revoir conversion automatique param string en int
+    [Inject] private IActionApi ActionApi { get; set; } = default!;
+    [Inject] private IGameApi GameApi { get; set; } = default!;
+    [Inject] private IPlayerApi PlayerApi { get; set; } = default!;
+    [Inject] private IGameNotificationService GameNotificationService { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Parameter] public int GameId { get; set; }
     private Game? Game { get; set; }
 
-    [CascadingParameter]
-    private AuthenticationState context { get; set; }
-
     private string ActionResultString { get; set; } = string.Empty;
-    private Player Player { get; set; }
+    private Player Player { get; set; } = default!;
+
+    private BoardLimit _boardLimit = new(null);
 
 
     protected override async Task OnInitializedAsync()
     {
-        if (int.TryParse(GameIdString, out var gameId) && gameId != 0)
-            Game = await GetGame(gameId);
-
         GameNotificationService.Initialize(NavigationManager.ToAbsoluteUri("/hubGame"));
         GameNotificationService.SubscribeTilesPlayed(TilesPlayed);
         GameNotificationService.SubscribeTilesSwapped(TilesSwapped);
         GameNotificationService.SubscribeTurnSkipped(TurnSkipped);
         GameNotificationService.SubscribePlayerIdTurn(PlayerIdTurn);
         GameNotificationService.SubscribeGameOver(GameOver);
+        GameNotificationService.SubscribePlayersInGame(PlayersInGame);
         await GameNotificationService.Start();
 
-        Player = await PlayerApi.GetByGameId(gameId);
-        await GameNotificationService.SendPlayerInGame(GameId, Player.Id);
+        if (GameId > 0)
+        {
+            Game = await GameApi.GetGame(GameId);
+            Player = await PlayerApi.GetByGameId(GameId);
+            await GameNotificationService.SendPlayerInGame(GameId, Player.Id);
+        }
+        _boardLimit = new(Game?.Board.Tiles);
     }
-
-
+    
     private void TilesPlayed(int playerId, Move move)
     {
         Console.WriteLine($"playerId {playerId} has play {move}");
+        Game!.Board.Tiles.UnionWith(move.Tiles);
+        StateHasChanged();
     }
 
     private void GameOver(int playerId)
@@ -61,6 +63,13 @@ public partial class GameComponent
         Console.WriteLine($"playerId {playerId} has swapped tiles");
     }
 
+    private void PlayersInGame(HashSet<int> playersIds)
+    {
+        Console.WriteLine($"playerIds {playersIds.SelectMany(item => $"{item} - ")} in game");
+    }
+
+
+
 
     private async Task PlayTiles()
     {
@@ -75,5 +84,5 @@ public partial class GameComponent
         ActionResultString = skipTurnReturn.Code.ToString();
     }
 
-    private async Task<Game> GetGame(int gameId) => await GameApi.GetUserGame(gameId);
+    public async ValueTask DisposeAsync() => await GameNotificationService.Stop();
 }

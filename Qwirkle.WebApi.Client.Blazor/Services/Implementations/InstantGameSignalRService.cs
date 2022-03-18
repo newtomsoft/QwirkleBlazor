@@ -1,6 +1,6 @@
 ﻿namespace Qwirkle.WebApi.Client.Blazor.Services.Implementations;
 
-public class InstantGameNotificationService : IInstantGameNotificationService
+public class InstantGameSignalRService : IInstantGameNotificationService
 {
     private HubConnection? _hubConnection;
 
@@ -10,7 +10,7 @@ public class InstantGameNotificationService : IInstantGameNotificationService
     }
     public async Task Start() => await _hubConnection!.StartAsync();
 
-    public async Task SendUserWaitingInstantGame(int playersNumber, string userName) => await _hubConnection!.SendAsync("UserWaitingInstantGame", playersNumber, userName);
+    public async Task SendUserWaitingInstantGame(int playersNumber, string userName) => await _hubConnection!.SendAsync(nameof(SignalRHub.UserWaitingInstantGame), playersNumber, userName);
 
     public void SubscribeInstantGameStarted(Action<int, int> receiveInstantGameStarted) => _hubConnection!.On(INotification.ReceiveInstantGameStarted, receiveInstantGameStarted);
 
