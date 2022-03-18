@@ -31,7 +31,7 @@ public class InstantGameController : ControllerBase
         var usersNames = _instantGameService.JoinInstantGame(UserName, playersNumberForStartGame);
         if (usersNames.Count != playersNumberForStartGame)
         {
-            _notification.SendInstantGameExpected(playersNumberForStartGame, UserName);
+            _notification.SendInstantGameJoined(playersNumberForStartGame, UserName);
             return Ok(new InstantGameModel { GameId = 0, UsersNames = usersNames.ToArray() });
         }
         var usersIds = usersNames.Select(userName => _infoService.GetUserId(userName)).ToHashSet();

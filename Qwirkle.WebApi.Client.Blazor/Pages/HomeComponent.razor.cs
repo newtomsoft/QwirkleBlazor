@@ -3,9 +3,12 @@
 public partial class HomeComponent
 {
     [Inject] private IGameApi GameApi { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
 
     private List<Game> Games { get; } = new();
     private Game? Game { get; set; }
+
+
 
     private async Task GetGames()
     {
@@ -16,8 +19,5 @@ public partial class HomeComponent
         }
     }
 
-    private async Task GetGame()
-    {
-        Game = await GameApi.GetUserGame(161);
-    }
+    private void GetGame() => NavigationManager.NavigateTo($"{Page.Game}/161");
 }

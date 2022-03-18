@@ -1,6 +1,6 @@
 ﻿namespace Qwirkle.WebApi.Client.Blazor.Services.Contracts;
 
-public interface INotificationService : IAsyncDisposable
+public interface IInstantGameNotificationService : IAsyncDisposable
 {
     public void Initialize(Uri hubUri);
     Task SendUserWaitingInstantGame(int playersNumber, string userName);

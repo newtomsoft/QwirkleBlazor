@@ -13,7 +13,9 @@ builder.Services.AddSingleton<AuthenticationStateProvider>(s => s.GetRequiredSer
 builder.Services.AddSingleton<IUserApi, UserApi>();
 builder.Services.AddSingleton<IActionApi, ActionApi>();
 builder.Services.AddSingleton<IGameApi, GameApi>();
+builder.Services.AddSingleton<IPlayerApi, PlayerApi>();
 builder.Services.AddSingleton<IInstantGameApi, InstantGameApi>();
-builder.Services.AddSingleton<INotificationService, NotificationService>();
+builder.Services.AddSingleton<IInstantGameNotificationService, InstantGameNotificationService>();
+builder.Services.AddSingleton<IGameNotificationService, GameNotificationService>();
 
 await builder.Build().RunAsync();

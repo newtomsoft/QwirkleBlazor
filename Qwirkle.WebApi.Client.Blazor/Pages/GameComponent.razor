@@ -1,14 +1,32 @@
-﻿@page "/Game/{GameId}"
+﻿@page "/Game/{GameIdString}"
+@page "/Game"
 @attribute [Authorize]
 
 <h3>Game</h3>
 
+
 @{
-    var skipTurnModel = new SkipTurnModel {GameId = 1};
+    var skipTurnModel = new SkipTurnModel { GameId = 1 };
 }
 
 <button id="btnPlayTiles" class="btn btn-lg btn-primary btn-block" @onclick="@PlayTiles">Play tiles</button>
 <button id="btnSkipTurn" class="btn btn-lg btn-primary btn-block" @onclick="@(() => SkipTurn(skipTurnModel))">Skip turn</button>
 
-
 <h3 id="actionResult">@ActionResultString</h3>
+
+
+@if (Game is not null)
+{
+    <p>@Game.Id - bag :@Game.Bag.TilesNumber tiles - board: @Game.Board.Tiles.Count tiles - players:@Game.Players.Count</p>
+    @foreach (var tile in Game.Board.Tiles)
+    {
+        <p>@tile.Shape @tile.Color @tile.Coordinates</p>
+    }
+    <div>
+        Rack :
+        @foreach (var tile in Game.Players.First(p => p.Id == Player.Id).Rack.Tiles)
+        {
+            <p>@tile.RackPosition @tile.Shape @tile.Color</p>
+        }
+    </div>
+}

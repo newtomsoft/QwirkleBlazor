@@ -9,12 +9,13 @@ public class SignalRNotification : INotification
         _hubContextQwirkle = hubContextQwirkle;
     }
 
-    public void SendPlayerIdTurn(int gameId, int playerId) => _hubContextQwirkle.Clients.Group(gameId.ToString()).SendAsync("ReceivePlayerIdTurn", playerId);
-    public void SendTurnSkipped(int gameId, int playerId) => _hubContextQwirkle.Clients.Group(gameId.ToString()).SendAsync("ReceiveTurnSkipped", playerId);
-    public void SendTilesPlayed(int gameId, int playerId, Move move) => _hubContextQwirkle.Clients.Group(gameId.ToString()).SendAsync("ReceiveTilesPlayed", playerId, move.Points, move.Tiles);
-    public void SendTilesSwapped(int gameId, int playerId) => _hubContextQwirkle.Clients.Group(gameId.ToString()).SendAsync("ReceiveTilesSwapped", playerId);
-    public void SendGameOver(int gameId, List<int> winnersPlayersIds) => _hubContextQwirkle.Clients.Group(gameId.ToString()).SendAsync("ReceiveGameOver", winnersPlayersIds);
+    public void SendPlayerIdTurn(int gameId, int playerId) => _hubContextQwirkle.Clients.Group(gameId.ToString()).SendAsync(INotification.ReceivePlayerIdTurn, playerId);
+    public void SendTurnSkipped(int gameId, int playerId) => _hubContextQwirkle.Clients.Group(gameId.ToString()).SendAsync(INotification.ReceiveTurnSkipped, playerId);
+    public void SendTilesPlayedOld(int gameId, int playerId, Move move) => _hubContextQwirkle.Clients.Group(gameId.ToString()).SendAsync(INotification.ReceiveTilesPlayed, playerId, move.Points, move.Tiles); //TODO remove
+    public void SendTilesPlayed(int gameId, int playerId, Move move) => _hubContextQwirkle.Clients.Group(gameId.ToString()).SendAsync(INotification.ReceiveTilesPlayedNew, playerId, move);
+    public void SendTilesSwapped(int gameId, int playerId) => _hubContextQwirkle.Clients.Group(gameId.ToString()).SendAsync(INotification.ReceiveTilesSwapped, playerId);
+    public void SendGameOver(int gameId, List<int> winnersPlayersIds) => _hubContextQwirkle.Clients.Group(gameId.ToString()).SendAsync(INotification.ReceiveGameOver, winnersPlayersIds);
 
     public void SendInstantGameStarted(int playersNumberForStartGame, int gameId) => _hubContextQwirkle.Clients.Group(HubQwirkle.InstantGameGroupName(playersNumberForStartGame)).SendAsync(INotification.ReceiveInstantGameStarted, playersNumberForStartGame, gameId);
-    public void SendInstantGameExpected(int playersNumberForStartGame, string userName) => _hubContextQwirkle.Clients.Group(HubQwirkle.InstantGameGroupName(playersNumberForStartGame)).SendAsync(INotification.ReceiveInstantGameJoined, userName);
+    public void SendInstantGameJoined(int playersNumberForStartGame, string userName) => _hubContextQwirkle.Clients.Group(HubQwirkle.InstantGameGroupName(playersNumberForStartGame)).SendAsync(INotification.ReceiveInstantGameJoined, userName);
 }

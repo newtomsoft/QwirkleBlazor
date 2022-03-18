@@ -1,14 +1,10 @@
 ﻿namespace Qwirkle.WebApi.Client.Blazor.Services.Implementations;
 
-public class UserApi : IUserApi
+public class UserApi : BaseApi, IUserApi
 {
-    private readonly HttpClient _httpClient;
-    private const string ControllerName = "User";
+    protected override string ControllerName => "User";
 
-    public UserApi(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
-    }
+    public UserApi(HttpClient httpClient) : base(httpClient) { }
 
     public async Task Login(LoginModel loginModel)
     {

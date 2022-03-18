@@ -1,14 +1,10 @@
 ﻿namespace Qwirkle.WebApi.Client.Blazor.Services.Implementations;
 
-public class GameApi : IGameApi
+public class GameApi : BaseApi, IGameApi
 {
-    private readonly HttpClient _httpClient;
-    private const string ControllerName = "Game";
+    protected override string ControllerName => "Game";
 
-    public GameApi(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
-    }
+    public GameApi(HttpClient httpClient) : base(httpClient) { }
 
     public async Task<List<int>> GetUserGamesIds()
     {

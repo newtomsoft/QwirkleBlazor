@@ -73,6 +73,7 @@ public class CoreService
         if (playReturn.Code != ReturnCode.Ok) return playReturn;
 
         playReturn = playReturn with { NewRack = PlayTiles(game, player, tilesToPlay, playReturn.Move.Points) };
+        _notification?.SendTilesPlayedOld(game.Id, playerId, playReturn.Move); //TODO remove
         _notification?.SendTilesPlayed(game.Id, playerId, playReturn.Move);
 
         return playReturn;

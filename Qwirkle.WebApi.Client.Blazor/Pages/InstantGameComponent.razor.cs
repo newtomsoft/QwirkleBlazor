@@ -3,8 +3,7 @@
 public partial class InstantGameComponent : IAsyncDisposable
 {
     [Inject] private IInstantGameApi InstantGameApi { get; set; }
-    [Inject] private INotificationService NotificationService { get; set; }
-
+    [Inject] private IInstantGameNotificationService InstantGameNotificationService { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
 
 
@@ -21,10 +20,10 @@ public partial class InstantGameComponent : IAsyncDisposable
     {
         _userName = authenticationStateTask.Result.User.Identity!.Name!;
 
-        NotificationService.Initialize(NavigationManager.ToAbsoluteUri("/hubGame"));
-        NotificationService.SubscribeInstantGameStarted(InstantGameStarted);
-        NotificationService.SubscribeInstantGameJoined(InstantGameJoinedBy);
-        await NotificationService.Start();
+        InstantGameNotificationService.Initialize(NavigationManager.ToAbsoluteUri("/hubGame"));
+        InstantGameNotificationService.SubscribeInstantGameStarted(InstantGameStarted);
+        InstantGameNotificationService.SubscribeInstantGameJoined(InstantGameJoinedBy);
+        await InstantGameNotificationService.Start();
     }
 
     private async Task JoinInstantGame(int playersNumber)
@@ -35,7 +34,7 @@ public partial class InstantGameComponent : IAsyncDisposable
         else
         {
             _playersNames = result.UsersNames.ToList();
-            await NotificationService.SendUserWaitingInstantGame(playersNumber, _userName);
+            await InstantGameNotificationService.SendUserWaitingInstantGame(playersNumber, _userName);
         }
     }
 
@@ -47,5 +46,5 @@ public partial class InstantGameComponent : IAsyncDisposable
         StateHasChanged();
     }
     
-    public async ValueTask DisposeAsync() => await NotificationService.DisposeAsync();
+    public async ValueTask DisposeAsync() => await InstantGameNotificationService.DisposeAsync();
 }

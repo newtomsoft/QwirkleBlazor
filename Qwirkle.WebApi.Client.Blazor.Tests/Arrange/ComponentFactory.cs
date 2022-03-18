@@ -41,7 +41,7 @@ public static class ComponentFactory<T> where T : ComponentBase
         var context = new TestContext();
         context.Services.AddSingleton(serviceInstance);
         context.AddTestAuthorization().SetAuthorized("userName");
-        context.Services.AddSingleton(new Mock<INotificationService>().Object);
+        context.Services.AddSingleton(new Mock<IInstantGameNotificationService>().Object);
         var userApi = new Mock<IUserApi>();
         context.Services.AddSingleton(userApi.Object);
         var identityAuthenticationStateProvider = new Mock<IdentityAuthenticationStateProvider>(userApi.Object);

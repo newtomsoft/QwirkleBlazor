@@ -1,14 +1,10 @@
 ﻿namespace Qwirkle.WebApi.Client.Blazor.Services.Implementations;
 
-public class InstantGameApi : IInstantGameApi
+public class InstantGameApi : BaseApi, IInstantGameApi
 {
-    private readonly HttpClient _httpClient;
-    private const string ControllerName = "InstantGame";
+    protected override string ControllerName => "InstantGame";
 
-    public InstantGameApi(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
-    }
+    public InstantGameApi(HttpClient httpClient) :base(httpClient) { }
 
     public async Task<InstantGameModel> JoinInstantGame(int playersNumber)
     {

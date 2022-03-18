@@ -5,6 +5,7 @@ public class HubQwirkle : Hub
     private static readonly Dictionary<int, List<Player>> GameIdWithPlayers = new();
     private static readonly Dictionary<int, HashSet<NotificationUser>> InstantGameWaitingUsers = new();
 
+
     public HubQwirkle()
     {
         InstantGameWaitingUsers.TryAdd(2, new HashSet<NotificationUser>());

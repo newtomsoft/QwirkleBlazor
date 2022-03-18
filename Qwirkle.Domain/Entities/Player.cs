@@ -2,10 +2,10 @@
 
 public record Player
 {
-    public int Id { get; }
-    public int UserId { get; }
-    public int GameId { get; }
-    public string Pseudo { get; }
+    public int Id { get; set; }
+    public int UserId { get; set; }
+    public int GameId { get; set; }
+    public string Pseudo { get; set; }
     public int GamePosition { get; set; }
     public int Points { get; set; }
     public int LastTurnPoints { get; set; }

@@ -1,13 +1,10 @@
 ﻿namespace Qwirkle.WebApi.Client.Blazor.Services.Implementations;
 
-public class ActionApi : IActionApi
+public class ActionApi : BaseApi, IActionApi
 {
-    private readonly HttpClient _httpClient;
-    private const string ControllerName = "Action";
-    public ActionApi(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
-    }
+    protected override string ControllerName => "Action";
+
+    public ActionApi(HttpClient httpClient) : base(httpClient) { }
 
     public async Task<PlayReturn> PlayTiles(List<TileModel> tiles)
     {
