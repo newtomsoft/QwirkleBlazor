@@ -2,13 +2,13 @@
 
 public class ActionApi : BaseApi, IActionApi
 {
-    protected override string ControllerName => "Action";
+    private const string ControllerName = "Action";
 
     public ActionApi(HttpClient httpClient) : base(httpClient) { }
 
     public async Task<PlayReturn> PlayTiles(List<TileModel> tiles)
     {
-        var response = await _httpClient.PostAsJsonAsync($"{ControllerName}/PlayTiles", tiles);
+        var response = await _httpClient.PostAsJsonAsync($"api/{ControllerName}/PlayTiles", tiles);
         if (response.StatusCode == HttpStatusCode.BadRequest) throw new Exception(await response.Content.ReadAsStringAsync());
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<PlayReturn>();
@@ -26,7 +26,7 @@ public class ActionApi : BaseApi, IActionApi
 
     public async Task<SkipTurnReturn> SkipTurn(SkipTurnModel skipTurnModel)
     {
-        var response = await _httpClient.PostAsJsonAsync($"{ControllerName}/SkipTurn", skipTurnModel);
+        var response = await _httpClient.PostAsJsonAsync($"api/{ControllerName}/SkipTurn", skipTurnModel);
         if (response.StatusCode == HttpStatusCode.BadRequest) throw new Exception(await response.Content.ReadAsStringAsync());
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<SkipTurnReturn>();

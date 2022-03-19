@@ -2,7 +2,7 @@
 
 [ApiController]
 [Authorize]
-[Route("User")]
+[Route("api/User")]
 public class UserController : ControllerBase
 {
     private readonly UserService _userService;

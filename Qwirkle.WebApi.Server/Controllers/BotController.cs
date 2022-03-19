@@ -2,7 +2,7 @@
 
 [ApiController]
 [Authorize(Roles = "Bot")]
-[Route("Bot")]
+[Route("api/Bot")]
 public class BotController : ControllerBase
 {
     private readonly BotService _botService;

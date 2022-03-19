@@ -2,7 +2,7 @@
 
 public class InstantGameSignalRService : IInstantGameNotificationService
 {
-    private HubConnection? _hubConnection;
+    private HubConnection _hubConnection = default!;
 
     public void Initialize(Uri hubUri)
     {
@@ -11,14 +11,12 @@ public class InstantGameSignalRService : IInstantGameNotificationService
     public async Task Start() => await _hubConnection!.StartAsync();
 
     public async Task SendUserWaitingInstantGame(int playersNumber, string userName) => await _hubConnection!.SendAsync(nameof(SignalRHub.UserWaitingInstantGame), playersNumber, userName);
-
     public void SubscribeInstantGameStarted(Action<int, int> receiveInstantGameStarted) => _hubConnection!.On(INotification.ReceiveInstantGameStarted, receiveInstantGameStarted);
-
     public void SubscribeInstantGameJoined(Action<string> receiveInstantJoined) => _hubConnection!.On(INotification.ReceiveInstantGameJoined, receiveInstantJoined);
 
 
     public async ValueTask DisposeAsync()
     {
-        if (_hubConnection is not null) await _hubConnection.DisposeAsync();
+        await _hubConnection.DisposeAsync();
     }
 }

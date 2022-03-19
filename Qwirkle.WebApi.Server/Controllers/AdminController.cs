@@ -2,7 +2,7 @@
 
 [ApiController]
 [Authorize(Roles = "Admin")]
-[Route("Admin")]
+[Route("api/Admin")]
 public class AdminController : ControllerBase
 {
     private readonly CoreService _coreService;
