@@ -38,7 +38,6 @@ public partial class GameComponent : IAsyncDisposable
     
     private void TilesPlayed(int playerId, Move move)
     {
-        Console.WriteLine($"playerId {playerId} has play {move}");
         Game!.Board.Tiles.UnionWith(move.Tiles);
         StateHasChanged();
     }

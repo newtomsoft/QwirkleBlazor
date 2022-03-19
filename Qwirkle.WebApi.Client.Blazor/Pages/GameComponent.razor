@@ -14,29 +14,60 @@
     <p>@Game.Id - bag :@Game.Bag.TilesNumber tiles - board: @Game.Board.Tiles.Count tiles - players:@Game.Players.Count</p>
     <div>
         Rack :
-        @foreach (var (rackPosition, tileColor, tileShape) in Game.Players.First(p => p.Id == Player.Id).Rack.Tiles)
-        {
-            <p>@rackPosition @tileShape @tileColor</p>
+        @{
+            var rack = string.Empty;
         }
+        @foreach (var (rackPosition, tileColor, tileShape) in Player.Rack.Tiles)
+        {
+            rack += $"{rackPosition} {tileColor}{tileShape} - ";
+        }
+        @rack
     </div>
 }
 
 @if (Game is not null)
 {
-    <table>
+    <table id="board">
         @for (var y = _boardLimit.MinY; y <= _boardLimit.MaxY; y++)
         {
             <tr>
                 @for (var x = _boardLimit.MinX; x <= _boardLimit.MaxX; x++)
                 {
-                    <td style="width: 4rem; height: 4rem; border: 1px solid;">
+                    <td>
                         @{
                             var tile = Game.Board.Tiles.FirstOrDefault(t => t.Coordinates == Coordinates.From(x, y));
+                            var tileName = string.Empty;
+                            if (tile is not null) tileName = $"{tile.Color}{tile.Shape}.svg";
                         }
-                        @tile?.Shape.ToString()[0] @tile?.Color.ToString()[0]
+                        @if (!string.IsNullOrEmpty(tileName))
+                        {
+                            <img src="img/@tileName" />
+                        }
                     </td>
                 }
             </tr>
         }
     </table>
+
+    <br/>
+
+    <table id="rack">
+        <tr>
+            @for (var rackPosition = 0; rackPosition < 6; rackPosition++)
+            {
+                <td style="width: 4rem; height: 4rem; border: 1px solid gray;">
+                    @{
+                        var tile = Player.Rack.Tiles.FirstOrDefault(t => t.RackPosition == rackPosition);
+                        var tileName = string.Empty;
+                        if (tile is not null) tileName = $"{tile.Color}{tile.Shape}.svg";
+                    }
+                    @if (!string.IsNullOrEmpty(tileName))
+                    {
+                        <img src="img/@tileName" />
+                    }
+                </td>
+            }
+        </tr>
+    </table>
+
 }
