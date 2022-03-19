@@ -20,7 +20,6 @@ global using Qwirkle.Infra.Repository.Dao;
 global using Qwirkle.SignalR;
 global using Qwirkle.SignalR.Adapters;
 global using Qwirkle.WebApi.Server.ExtensionMethods;
-global using Qwirkle.WebApi.Server.Models;
 global using Qwirkle.WebApi.Server.Securities;
 global using Qwirkle.WebApi.Shared;
 global using Serilog;
