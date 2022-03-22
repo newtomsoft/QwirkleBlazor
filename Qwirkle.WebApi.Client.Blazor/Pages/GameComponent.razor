@@ -1,73 +1,52 @@
 ﻿@page "/Game/{GameId:int}"
 @attribute [Authorize]
 
-<h3>Game</h3>
-
-<button id="btnPlayTiles" class="btn btn-lg btn-primary btn-block" @onclick="@PlayTiles">Play tiles</button>
-<button id="btnSkipTurn" class="btn btn-lg btn-primary btn-block" @onclick="@(() => SkipTurn(new SkipTurnModel { GameId = GameId }))">Skip turn</button>
-
-<h3 id="actionResult">@ActionResultString</h3>
-
-
-@if (Game is not null)
+@if (_isInitialized)
 {
-    <p>@Game.Id - bag :@Game.Bag.TilesNumber tiles - board: @Game.Board.Tiles.Count tiles - players:@Game.Players.Count</p>
-    <div>
-        Rack :
-        @{
-            var rack = string.Empty;
-        }
-        @foreach (var (rackPosition, tileColor, tileShape) in Player.Rack.Tiles)
-        {
-            rack += $"{rackPosition} {tileColor}{tileShape} - ";
-        }
-        @rack
-    </div>
-}
-
-@if (Game is not null)
-{
-    <table id="board">
-        @for (var y = _boardLimit.MinY; y <= _boardLimit.MaxY; y++)
-        {
-            <tr>
-                @for (var x = _boardLimit.MinX; x <= _boardLimit.MaxX; x++)
-                {
-                    <td>
-                        @{
-                            var tile = Game.Board.Tiles.FirstOrDefault(t => t.Coordinates == Coordinates.From(x, y));
-                            var tileName = string.Empty;
-                            if (tile is not null) tileName = $"{tile.Color}{tile.Shape}.svg";
-                        }
-                        @if (!string.IsNullOrEmpty(tileName))
-                        {
-                            <img src="img/@tileName" />
-                        }
-                    </td>
-                }
-            </tr>
-        }
-    </table>
-
-    <br/>
-
-    <table id="rack">
-        <tr>
-            @for (var rackPosition = 0; rackPosition < 6; rackPosition++)
+    <MudDropContainer T="DropItem" ItemIsDisabled="@(item => DragNDropManager.IsDisabled(item))" Items="DragNDropManager.AllTilesInGame" CanDropClass="mud-border-info" NoDropClass="mud-border-error" CanDrop="@((_, identifier) => DragNDropManager.IsDroppable(identifier))" ItemsSelector="@((item, identifier) => item.Identifier == identifier)" ItemDropped="mudItemDropInfo => DragNDropManager.ItemDropped(mudItemDropInfo)" Class="border-2 border-solid mud-border-lines-default">
+        <ChildContent>
+            @for (var y = AreaManager.BoardLimit.MinY; y <= AreaManager.BoardLimit.MaxY; y++)
             {
-                <td style="width: 4rem; height: 4rem; border: 1px solid gray;">
-                    @{
-                        var tile = Player.Rack.Tiles.FirstOrDefault(t => t.RackPosition == rackPosition);
-                        var tileName = string.Empty;
-                        if (tile is not null) tileName = $"{tile.Color}{tile.Shape}.svg";
-                    }
-                    @if (!string.IsNullOrEmpty(tileName))
+                <div class="d-flex">
+                    @for (var x = AreaManager.BoardLimit.MinX; x <= AreaManager.BoardLimit.MaxX; x++)
                     {
-                        <img src="img/@tileName" />
+                        <MudDropZone T="DropItem" Identifier="@DragNDropManager.ToBoardIdentifier(Coordinates.From(x, y))" DraggingClass="mud-theme-success" Class="d-flex justify-center align-center border-2 border-solid docs-gray-bg mud-border-lines-default" Style="@AreaManager.BoardSquareSize"/>
                     }
-                </td>
+                </div>
             }
-        </tr>
-    </table>
-
+            <div class="d-flex">
+                <div id="rack" class="d-flex">
+                    @for (var rackIndex = 0; rackIndex < CoreService.TilesNumberPerPlayer; rackIndex++)
+                    {
+                        <MudDropZone T="DropItem" Identifier="@DragNDropManager.ToRackIdentifier(rackIndex)" DraggingClass="mud-theme-success" Class="d-flex justify-center align-center border-2 border-solid docs-gray-bg mud-border-lines-default" Style="height: 80px; width: 80px;"/>
+                    }
+                </div>
+                <div id="bag" class="d-flex">
+                    <div class="d-flex">
+                        @for (var bagIndex = 0; bagIndex < 3; bagIndex++)
+                        {
+                            <MudDropZone T="DropItem" Identifier="@DragNDropManager.ToBagIdentifier(bagIndex)" DraggingClass="mud-theme-success" Class="d-flex justify-center align-center border-2 border-solid docs-gray-bg mud-border-lines-default" Style="height: 30px; width: 30px;"/>
+                        }
+                    </div>
+                    <div class="d-flex">
+                        @for (var bagIndex = 3; bagIndex < CoreService.TilesNumberPerPlayer; bagIndex++)
+                        {
+                            <MudDropZone T="DropItem" Identifier="@DragNDropManager.ToBagIdentifier(bagIndex)" DraggingClass="mud-theme-success" Class="d-flex justify-center align-center border-2 border-solid docs-gray-bg mud-border-lines-default" Style="height: 30px; width: 30px;"/>
+                        }
+                    </div>
+                </div>
+            </div>
+        </ChildContent>
+        <ItemRenderer>
+            <div class="d-flex justify-center align-center flex-grow-1" Style="height: 100%; width: 100%;">
+                <MudImage Fluid="true" ObjectFit="ObjectFit.ScaleDown" Src="@($"img/{context.Tile.Color}{context.Tile.Shape}.svg")" Elevation="25" />
+            </div>
+        </ItemRenderer>
+    </MudDropContainer>
 }
+
+<MudButton id="btnPlayTiles" Variant="Variant.Filled" Color="Color.Primary" OnClick="PlayTiles">Play tiles</MudButton>
+<MudButton id="btnSwapTiles" Variant="Variant.Filled" Color="Color.Primary" OnClick="SwapTiles">Swap tiles</MudButton>
+<MudButton id="btnSkipTurn" Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => SkipTurn(new SkipTurnModel { GameId = GameId }))">Skip turn</MudButton>
+
+<h3 id="actionResult">@_actionResultString</h3>

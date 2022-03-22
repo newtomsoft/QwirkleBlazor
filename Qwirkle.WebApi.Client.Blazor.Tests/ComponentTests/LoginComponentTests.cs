@@ -22,7 +22,7 @@ public class LoginComponentTests
         loginComponent.Find("#btnSignIn").Click();
 
         var newUri = new Uri(navigationManager.Uri);
-        newUri.LocalPath.ShouldBe(Page.Home);
+        newUri.LocalPath.ShouldBe(PageName.Home);
     }
 
 
@@ -33,6 +33,6 @@ public class LoginComponentTests
         loginComponent.Find("#btnLoginAsGuest").Click();
 
         var newUri = new Uri(navigationManager.Uri);
-        newUri.LocalPath.ShouldBe(Page.InstantGame);
+        newUri.LocalPath.ShouldBe(PageName.InstantGame);
     }
 }

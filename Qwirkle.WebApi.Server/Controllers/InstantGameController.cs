@@ -28,15 +28,16 @@ public class InstantGameController : ControllerBase
     {
         if (playersNumberForStartGame is < 2 or > 4) return BadRequest("game must have between 2 and 4 players");
         _logger.LogInformation("JoinInstantGame with {playersNumber}", playersNumberForStartGame);
-        var usersNames = _instantGameService.JoinInstantGame(UserName, playersNumberForStartGame);
+        var instantGameResult = _instantGameService.JoinInstantGame(UserName, playersNumberForStartGame);
+        var usersNames = instantGameResult.UsersNames;
         if (usersNames.Count != playersNumberForStartGame)
         {
-            _notification.SendInstantGameJoined(playersNumberForStartGame, UserName);
-            return Ok(new InstantGameModel { GameId = 0, UsersNames = usersNames.ToArray() });
+            if (instantGameResult.IsAdded) _notification.SendInstantGameJoined(playersNumberForStartGame, UserName);
+            return Ok(new InstantGameModel { IsAdded = instantGameResult.IsAdded, GameId = 0, UsersNames = usersNames.ToArray() });
         }
         var usersIds = usersNames.Select(userName => _infoService.GetUserId(userName)).ToHashSet();
         var gameId = _coreService.CreateGameWithUsersIds(usersIds);
         _notification.SendInstantGameStarted(playersNumberForStartGame, gameId);
-        return Ok(new InstantGameModel { GameId = gameId, UsersNames = usersNames.ToArray() });
+        return Ok(new InstantGameModel { IsAdded = instantGameResult.IsAdded, GameId = gameId, UsersNames = usersNames.ToArray() });
     }
 }

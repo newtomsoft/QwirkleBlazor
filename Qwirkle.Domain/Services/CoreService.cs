@@ -119,7 +119,7 @@ public class CoreService
         if (!game.IsBoardEmpty() && IsAnyTileIsolated()) return new PlayReturn(game.Id, ReturnCode.TileIsolated, Move.Empty, Rack.Empty);
 
         var wonPoints = ComputePoints.Compute(game, tilesPlayed);
-        if (wonPoints == 0) return new PlayReturn(game.Id, ReturnCode.TilesDoesntMakedValidRow, Move.Empty, Rack.Empty);
+        if (wonPoints == 0) return new PlayReturn(game.Id, ReturnCode.TilesDoesntMakeValidRow, Move.Empty, Rack.Empty);
         if (game.IsBoardEmpty() && !simulationMode && IsFirstMoveNotCompliant()) return new PlayReturn(game.Id, ReturnCode.NotMostPointsMove, Move.Empty, Rack.Empty);
         if (!IsGameFinished()) return new PlayReturn(game.Id, ReturnCode.Ok, new Move(orderedTilesPlayed, wonPoints), Rack.Empty);
 

@@ -2,22 +2,33 @@
 
 public partial class HomeComponent
 {
-    [Inject] private IGameApi GameApi { get; set; }
-    [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private IApiGame ApiGame { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 
     private List<Game> Games { get; } = new();
-    private Game? Game { get; set; }
+    private List<int> GamesIds { get; set; } = new();
 
+    protected override async Task<Task> OnInitializedAsync()
+    {
+        GamesIds = await ApiGame.GetUserGamesIds();
+        return base.OnInitializedAsync();
+    }
 
 
     private async Task GetGames()
     {
-        var gamesIds = await GameApi.GetUserGamesIds();
+        var gamesIds = await ApiGame.GetUserGamesIds();
         foreach (var gameId in gamesIds)
         {
-            Games.Add(await GameApi.GetGame(gameId));
+            Games.Add(await ApiGame.GetGame(gameId));
         }
     }
 
-    private void GetGame() => NavigationManager.NavigateTo($"{Page.Game}/161");
+    private void GetGame(int gameId) => NavigationManager.NavigateTo($"{PageName.Game}/{gameId}");
+
+    private async Task CreateTestGame()
+    {
+        var gameId = await ApiGame.CreateGame(new List<string>());
+        NavigationManager.NavigateTo($"{PageName.Game}/{gameId}");
+    }
 }

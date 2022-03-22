@@ -2,21 +2,29 @@
 @inject NavigationManager _navigationManager
 @inject IdentityAuthenticationStateProvider _authStateProvider
 
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
 <div class="page">
     <AuthorizeView>
         <Authorized>
             <div class="sidebar">
                 <NavMenu />
             </div>
-                <div class="main">
-                    <div class="top-row px-4">
-                        <button type="button" class="btn btn-link ml-md-auto" @onclick="@LogoutClick">Logout</button>
-                    </div>
-
-                    <div class="content px-4">
-                        @Body
-                    </div>
+            <div class="main">
+                <div class="top-row px-4">
+                    <MudButton StartIcon="@Icons.Material.Filled.Logout" @onclick="@LogoutClick">Logout</MudButton>
                 </div>
+
+                <div class="content px-4">
+                    <MudLayout>
+                        <MudMainContent>
+                            @Body
+                        </MudMainContent>
+                    </MudLayout>
+                </div>
+            </div>
         </Authorized>
         <NotAuthorized>
             <div class="sidebar">

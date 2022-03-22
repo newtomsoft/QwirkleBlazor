@@ -13,7 +13,7 @@ public partial class RegisterComponent
         try
         {
             await AuthStateProvider!.Register(RegisterModel);
-            NavigationManager!.NavigateTo(Page.Home);
+            NavigationManager!.NavigateTo(PageName.Home);
         }
         catch (Exception ex)
         {
@@ -24,6 +24,6 @@ public partial class RegisterComponent
     private async Task LoginAsGuest()
     {
         await AuthStateProvider!.RegisterGuest();
-        NavigationManager!.NavigateTo(Page.InstantGame);
+        NavigationManager!.NavigateTo(PageName.InstantGame);
     }
 }

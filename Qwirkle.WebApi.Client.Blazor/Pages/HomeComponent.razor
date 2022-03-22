@@ -10,35 +10,18 @@
         <p>Welcome to Qwirkle.</p>
 
 
-        <div class="form-signin">
-            <button id="btnGetGamesIds" class="btn btn-lg btn-primary btn-block" @onclick="@GetGames">My games</button>
-        </div>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => GetGame(GamesIds.OrderByDescending(id => id).First()))">Last game</MudButton>
         
-        @if (Games.Any())
-        {
-            @foreach (var game in Games)
-            {
-                <p>@game.Id  -  bag :@game.Bag.TilesNumber tiles - board: @game.Board.Tiles.Count tiles - players:@game.Players.Count</p>
-                @foreach (var player in game.Players)
-                {
-                    <p>player: @player.Id name:@player.Pseudo</p>
-                }
-            }
-        }
-        
-        
-        <div class="form-signin">
-            <button id="btnGetGame" class="btn btn-lg btn-primary btn-block" @onclick="@GetGame">Game 161</button>
-        </div>
-    @if (Game is not null)
-    {
-        <p>@Game.Id - bag :@Game.Bag.TilesNumber tiles - board: @Game.Board.Tiles.Count tiles - players:@Game.Players.Count</p>
-        @foreach (var player in Game.Players)
-        {
-            <p>player: @player.Id name:@player.Pseudo</p>
-        }
-    }
+        <MudButton id="btnGetGamesIds" Variant="Variant.Filled" Color="Color.Primary" OnClick="GetGames">My games</MudButton>
 
+        <MudButton id="btnCreateTestGame" Variant="Variant.Filled" Color="Color.Primary" OnClick="CreateTestGame">Create test game</MudButton>
+
+        @foreach (var game in Games.OrderByDescending(g => g.Id))
+        {
+            <div class="form-signin">
+                <button id="btnGetGame" class="btn btn-lg btn-primary btn-block" @onclick="@(() => GetGame(game.Id))">Game @game.Id</button>
+            </div>
+        }
     </Authorized>
 
 </AuthorizeView>

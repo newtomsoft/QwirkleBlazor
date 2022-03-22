@@ -2,49 +2,61 @@
 
 public partial class InstantGameComponent : IAsyncDisposable
 {
-    [Inject] private IInstantGameApi InstantGameApi { get; set; }
-    [Inject] private IInstantGameNotificationService InstantGameNotificationService { get; set; }
-    [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private IApiInstantGame ApiInstantGame { get; set; } = default!;
+    [Inject] private INotificationInstantGame NotificationInstantGame { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private ISnackbar SnackBar { get; set; } = default!;
 
-
-    [Parameter] public string? PlayersNumber { get; set; }
+    [Parameter] public int PlayersNumber { get; set; }
+    [CascadingParameter] private Task<AuthenticationState> AuthenticationStateTask { get; set; } = default!;
 
     private string _userName = string.Empty;
-    private List<string> _playersNames = new();
-
-
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    private readonly List<string> _playersNamesWaiting = new();
 
     protected override async Task OnInitializedAsync()
     {
-        _userName = authenticationStateTask.Result.User.Identity!.Name!;
+        _userName = AuthenticationStateTask.Result.User.Identity!.Name!;
+        await InitializeNotifications();
+    }
 
-        InstantGameNotificationService.Initialize(NavigationManager.ToAbsoluteUri("/hubGame"));
-        InstantGameNotificationService.SubscribeInstantGameStarted(InstantGameStarted);
-        InstantGameNotificationService.SubscribeInstantGameJoined(InstantGameJoinedBy);
-        await InstantGameNotificationService.Start();
+    private async Task InitializeNotifications()
+    {
+        NotificationInstantGame.Initialize(NavigationManager.ToAbsoluteUri("/hubGame"));
+        NotificationInstantGame.SubscribeInstantGameStarted(InstantGameStarted);
+        NotificationInstantGame.SubscribeInstantGameJoined(InstantGameJoinedBy);
+        await NotificationInstantGame.Start();
     }
 
     private async Task JoinInstantGame(int playersNumber)
     {
-        var result = await InstantGameApi.JoinInstantGame(playersNumber);
+        PlayersNumber = playersNumber;
+        var result = await ApiInstantGame.JoinInstantGame(playersNumber);
         if (result.GameId != 0)
-            NavigationManager.NavigateTo($"{Page.Game}/{result.GameId}");
+            NavigationManager.NavigateTo($"{PageName.Game}/{result.GameId}");
+        else if (result.IsAdded)
+        {
+            _playersNamesWaiting.AddRange(result.UsersNames.ToList());
+            StateHasChanged();
+            var otherPlayersNamesWaiting = _playersNamesWaiting.Where(name => name != _userName).ToList();
+            if (otherPlayersNamesWaiting.Any()) SnackBar.Add($"{string.Join(", ", otherPlayersNamesWaiting)} waiting with you");
+            SnackBar.Add($"Waiting for {playersNumber - _playersNamesWaiting.Count} player(s)");
+            await NotificationInstantGame.SendUserWaitingInstantGame(playersNumber, _userName);
+        }
         else
         {
-            _playersNames = result.UsersNames.ToList();
-            await InstantGameNotificationService.SendUserWaitingInstantGame(playersNumber, _userName);
+            SnackBar.Add($"You're already waiting for the game");
         }
     }
 
-    private void InstantGameStarted(int playersNumberForStartGame, int gameId) => NavigationManager.NavigateTo($"{Page.Game}/{gameId}");
+    private void InstantGameStarted(int playersNumberForStartGame, int gameId) => NavigationManager.NavigateTo($"{PageName.Game}/{gameId}");
 
     private void InstantGameJoinedBy(string userName)
     {
-        _playersNames.Add(userName);
+        _playersNamesWaiting.Add(userName);
+        SnackBar.Add($"{userName} has join the game");
+        SnackBar.Add($"Waiting for {PlayersNumber - _playersNamesWaiting.Count } player(s)");
         StateHasChanged();
     }
 
-    public async ValueTask DisposeAsync() => await InstantGameNotificationService.DisposeAsync();
+    public async ValueTask DisposeAsync() => await NotificationInstantGame.DisposeAsync();
 }

@@ -9,7 +9,7 @@ public interface INotification
     const string ReceiveTilesSwapped = "ReceiveTilesSwapped";
     const string ReceiveGameOver = "ReceiveGameOver";
     const string ReceivePlayersInGame = "ReceivePlayersInGame";
-    
+
     void SendTurnSkipped(int gameId, int playerId);
     void SendPlayerIdTurn(int gameId, int playerId);
     void SendTilesPlayedOld(int gameId, int playerId, Move move); // TODO remove

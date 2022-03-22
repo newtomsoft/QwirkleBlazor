@@ -2,86 +2,122 @@
 
 public partial class GameComponent : IAsyncDisposable
 {
-    [Inject] private IActionApi ActionApi { get; set; } = default!;
-    [Inject] private IGameApi GameApi { get; set; } = default!;
-    [Inject] private IPlayerApi PlayerApi { get; set; } = default!;
-    [Inject] private IGameNotificationService GameNotificationService { get; set; } = default!;
-    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Parameter] public int GameId { get; set; }
-    private Game? Game { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private IApiAction ApiAction { get; set; } = default!;
+    [Inject] private IApiGame ApiGame { get; set; } = default!;
+    [Inject] private IApiPlayer ApiPlayer { get; set; } = default!;
+    [Inject] private INotificationGame NotificationGame { get; set; } = default!;
+    [Inject] private ISnackbar SnackBar { get; set; } = default!;
+    [Inject] private INotificationReceiver NotificationReceiver { get; set; } = default!;
+    [Inject] private IAreaManager AreaManager { get; set; } = default!;
+    [Inject] private IDragNDropManager DragNDropManager { get; set; } = default!;
 
-    private string ActionResultString { get; set; } = string.Empty;
-    private Player Player { get; set; } = default!;
-
-    private BoardLimit _boardLimit = new(null);
-
+    private string _actionResultString = string.Empty;
+    private Game _game = default!;
+    private Player _player = default!;
+    private bool _isInitialized;
 
     protected override async Task OnInitializedAsync()
     {
-        GameNotificationService.Initialize(NavigationManager.ToAbsoluteUri("/hubGame"));
-        GameNotificationService.SubscribeTilesPlayed(TilesPlayed);
-        GameNotificationService.SubscribeTilesSwapped(TilesSwapped);
-        GameNotificationService.SubscribeTurnSkipped(TurnSkipped);
-        GameNotificationService.SubscribePlayerIdTurn(PlayerIdTurn);
-        GameNotificationService.SubscribeGameOver(GameOver);
-        GameNotificationService.SubscribePlayersInGame(PlayersInGame);
-        await GameNotificationService.Start();
+        if (GameId <= 0) return;
 
-        if (GameId > 0)
-        {
-            Game = await GameApi.GetGame(GameId);
-            Player = await PlayerApi.GetByGameId(GameId);
-            await GameNotificationService.SendPlayerInGame(GameId, Player.Id);
-        }
-        _boardLimit = new(Game?.Board.Tiles);
+        BoardChanged += (source, eventArgs) => DragNDropManager.OnBoardChanged(source, eventArgs);
+        BoardChanged += (source, eventArgs) => AreaManager.OnBoardChanged(source, eventArgs);
+        RackChanged += DragNDropManager.OnRackChanged;
+
+        _game = await ApiGame.GetGame(GameId);
+        OnBoardChanged(_game.Board);
+        _player = await ApiPlayer.GetByGameId(GameId);
+        OnRackChanged(_player.Rack);
+
+        DragNDropManager.Initialize(StateHasChanged);
+        await InitializeNotifications();
+
+        _isInitialized = true;
+        await NotificationGame.SendPlayerInGame(GameId, _player.Id);
+    }
+
+
+
+    private async Task InitializeNotifications()
+    {
+        NotificationReceiver.Initialize(_game, _player, AreaManager.BoardLimit, StateHasChanged);
+        NotificationGame.SubscribePlayersInGame(NotificationReceiver.PlayersInGame);
+        NotificationGame.SubscribeTilesPlayed(NotificationReceiver.TilesPlayed);
+        NotificationGame.SubscribeTilesSwapped(NotificationReceiver.TilesSwapped);
+        NotificationGame.SubscribeTurnSkipped(NotificationReceiver.TurnSkipped);
+        NotificationGame.SubscribePlayerIdTurn(NotificationReceiver.PlayerIdTurn);
+        NotificationGame.SubscribeGameOver(NotificationReceiver.GameOver);
+        await NotificationGame.Start();
     }
     
-    private void TilesPlayed(int playerId, Move move)
-    {
-        Game!.Board.Tiles.UnionWith(move.Tiles);
-        StateHasChanged();
-    }
-
-    private void GameOver(int playerId)
-    {
-        Console.WriteLine($"game is over. {playerId} win");
-    }
-
-    private void PlayerIdTurn(int playerId)
-    {
-        Console.WriteLine($"it's playerId {playerId} to play");
-    }
-
-    private void TurnSkipped(int playerId)
-    {
-        Console.WriteLine($"playerId {playerId} has skipped turn");
-    }
-
-    private void TilesSwapped(int playerId)
-    {
-        Console.WriteLine($"playerId {playerId} has swapped tiles");
-    }
-
-    private void PlayersInGame(HashSet<int> playersIds)
-    {
-        Console.WriteLine($"playerIds {playersIds.SelectMany(item => $"{item} - ")} in game");
-    }
-
-
-
-
     private async Task PlayTiles()
     {
-        var tileModel = new TileModel { GameId = GameId, Shape = TileShape.Circle, Color = TileColor.Green, X = 0, Y = 0 };
-        var tiles = new List<TileModel> { tileModel };
-        var playReturn = await ActionApi.PlayTiles(tiles);
+        var tilesModel = DragNDropManager.TilesDroppedInBoard.Select(t => new TileModel { GameId = GameId, Shape = t.Tile.Shape, Color = t.Tile.Color, X = t.Coordinates.X, Y = t.Coordinates.Y }).ToList();
+        if (!tilesModel.Any())
+        {
+            SnackBar.Add("please move some tiles into board");
+            return;
+        }
+        var playReturn = await ApiAction.PlayTiles(tilesModel);
+        if (playReturn is { Code: ReturnCode.Ok })
+        {
+            _player.Rack = playReturn.NewRack;
+            OnRackChanged(playReturn.NewRack);
+            _game.Board.AddTiles(tilesModel.Select(t => t.ToTileOnBoard()));
+            OnBoardChanged(_game.Board);
+            StateHasChanged();
+            NavigationManager.NavigateTo($"{PageName.Game}/{GameId}"); //try
+        }
+        else
+        {
+            SnackBar.Add($"{playReturn.Code.ToDisplay()}");
+        }
     }
+
+    public event EventHandler<BoardChangedEventArgs> BoardChanged = default!;
+    protected virtual void OnBoardChanged(Board board)
+    {
+        BoardChanged.Invoke(this, new BoardChangedEventArgs() { Board = board });
+    }
+
+
+    private async Task SwapTiles()
+    {
+        var tilesModel = DragNDropManager.TilesDroppedInBag.Select(t => new TileModel { GameId = GameId, Shape = t.Tile.Shape, Color = t.Tile.Color }).ToList();
+        if (!tilesModel.Any())
+        {
+            SnackBar.Add("please move some tiles into bag");
+            return;
+        }
+        var swapTilesReturn = await ApiAction.SwapTiles(tilesModel);
+        if (swapTilesReturn is { Code: ReturnCode.Ok })
+        {
+            _player.Rack = swapTilesReturn.NewRack;
+            OnRackChanged(_player.Rack);
+            StateHasChanged();
+        }
+        else
+        {
+            SnackBar.Add($"{swapTilesReturn.Code.ToDisplay()}");
+        }
+    }
+
+    public event EventHandler<RackChangedEventArgs> RackChanged = default!;
+    protected virtual void OnRackChanged(Rack rack)
+    {
+        RackChanged.Invoke(this, new RackChangedEventArgs() { Rack = rack });
+    }
+
 
     private async Task SkipTurn(SkipTurnModel skipTurnModel)
     {
-        var skipTurnReturn = await ActionApi.SkipTurn(skipTurnModel);
-        ActionResultString = skipTurnReturn.Code.ToString();
+        var skipTurnReturn = await ApiAction.SkipTurn(skipTurnModel);
+        _actionResultString = skipTurnReturn.Code.ToString();
+        if (skipTurnReturn is not { Code: ReturnCode.Ok })
+            SnackBar.Add($"{skipTurnReturn.Code.ToDisplay()}", Severity.Error);
     }
 
-    public async ValueTask DisposeAsync() => await GameNotificationService.Stop();
+    public async ValueTask DisposeAsync() => await NotificationGame.Stop();
 }

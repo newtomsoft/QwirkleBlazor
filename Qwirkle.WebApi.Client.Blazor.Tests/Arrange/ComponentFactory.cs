@@ -1,4 +1,7 @@
-﻿namespace Qwirkle.WebApi.Client.Blazor.Tests.Arrange;
+﻿using MudBlazor;
+using Qwirkle.WebApi.Client.Blazor.Services.Contracts.Notifications;
+
+namespace Qwirkle.WebApi.Client.Blazor.Tests.Arrange;
 
 public static class ComponentFactory<T> where T : ComponentBase
 {
@@ -45,7 +48,7 @@ public static class ComponentFactory<T> where T : ComponentBase
         var context = new TestContext();
         if (isAuthorized) context.AddTestAuthorization().SetAuthorized("userName");
         else context.AddTestAuthorization().SetNotAuthorized();
-        var userApi = new Mock<IUserApi>();
+        var userApi = new Mock<IApiUser>();
         context.Services.AddSingleton(userApi.Object);
         var identityAuthenticationStateProvider = new Mock<IdentityAuthenticationStateProvider>(userApi.Object);
         context.Services.AddSingleton(identityAuthenticationStateProvider.Object);
@@ -104,8 +107,13 @@ public static class ComponentFactory<T> where T : ComponentBase
     private static void AddUserAuthorizationService(TestContext context)
     {
         context.AddTestAuthorization().SetAuthorized("userName");
-        context.Services.AddSingleton(new Mock<IInstantGameNotificationService>().Object);
-        var userApi = new Mock<IUserApi>();
+        context.Services.AddSingleton(new Mock<INotificationInstantGame>().Object);
+
+        var snackBar = new Mock<ISnackbar>();
+        snackBar.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<Severity>(), null)).Verifiable();
+        context.Services.AddSingleton(snackBar.Object);
+
+        var userApi = new Mock<IApiUser>();
         context.Services.AddSingleton(userApi.Object);
         var identityAuthenticationStateProvider = new Mock<IdentityAuthenticationStateProvider>(userApi.Object);
         context.Services.AddSingleton(identityAuthenticationStateProvider.Object);

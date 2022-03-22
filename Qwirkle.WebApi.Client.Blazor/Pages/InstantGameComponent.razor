@@ -1,16 +1,16 @@
 ﻿@page "/InstantGame/"
-@page "/InstantGame/{PlayersNumber}"
+@page "/InstantGame/{PlayersNumber:int}"
 @attribute [Authorize]
 
 <h1>InstantGame</h1>
 
-@if (_playersNames.Any())
+@if (_playersNamesWaiting.Any())
 {
     <h3>player waiting ... </h3>
     <ul>
-    @foreach (var playerName in _playersNames)
+    @foreach (var playerName in _playersNamesWaiting)
     {
-        <li>@playerName</li>
+        <li class="waitingPlayer">@playerName</li>
     }
     </ul>
 }

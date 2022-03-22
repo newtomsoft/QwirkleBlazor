@@ -28,7 +28,7 @@ public class RegisterComponentTests
         if (string.IsNullOrEmpty(input.InputSelectorInError))
         {
             var newUri = new Uri(navigationManager.Uri);
-            newUri.LocalPath.ShouldBe(Page.Home);
+            newUri.LocalPath.ShouldBe(PageName.Home);
         }
         else
         {
