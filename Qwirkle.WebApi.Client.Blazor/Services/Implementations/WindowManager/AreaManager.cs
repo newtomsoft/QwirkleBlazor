@@ -2,59 +2,55 @@
 
 public class AreaManager : IAreaManager
 {
+    public BoardLimit BoardLimit { get; }
+    public string BoardSquareSize { get; private set; } = "height:150px; width:150px;"; //Todo
+
     private readonly IJSRuntime _jsRuntime;
-    private readonly AreaDimension _menuDimension = new() { Width = 200, Height = 56 }; //todo use it for menu
-    private readonly AreaDimension _commandArea = new() { Width = 200, Height = 200 }; //todo use it for command
-    private AreaDimension _boardDimension = default!;
-
-
-
-    public BoardLimit BoardLimit { get; private set; }
-    public string BoardSquareSize { get; private set; }
+    private readonly AreaDimension _menuDimension = new(200, 56); //todo use it for menu
+    private readonly AreaDimension _commandArea = new(200, 200); //todo use it for command
 
     public AreaManager(IJSRuntime jsRuntime)
     {
         _jsRuntime = jsRuntime;
-        BoardLimit = new BoardLimit(new[] {Coordinates.From(0, 0),});
+        BoardLimit = new BoardLimit(new[] { Coordinate.From(0, 0) });
     }
 
-    public async Task OnBoardChanged(object source, BoardChangedEventArgs eventArgs)
+    public async Task OnTilesOnBoardPlayed(object source, TilesOnBoardPlayedEventArgs eventArgs)
     {
-        Console.WriteLine("AreaManager: board changed");
-
-        var coordinatesInBoard = new List<Coordinates>(eventArgs.Board.Tiles.Select(t => t.Coordinates));
-        BoardLimit = GetBoardLimits(coordinatesInBoard);
+        Console.WriteLine("AreaManager: tiles On Board changed");
+        var coordinatesInBoard = new List<Coordinate>(eventArgs.TilesOnBoard.Select(t => t.Coordinate));
+        BoardLimit.Enlarge(coordinatesInBoard);
         await UpdateBoardSquareSizeAsync();
     }
-    public async Task OnTileInBoardDropped(object sender, TileInBoardDroppedEventArgs eventArgs)
+    public async Task OnTileOnBoardDropped(object sender, TileOnBoardEventArgs eventArgs)
     {
-        Console.WriteLine("AreaManager: tile dropped in board");
-        BoardLimit.Enlarge(eventArgs.Coordinates);
+        Console.WriteLine("AreaManager: tile dropped on board");
+        BoardLimit.Enlarge(eventArgs.Coordinate);
         await UpdateBoardSquareSizeAsync();
     }
 
-    private BoardLimit GetBoardLimits(IEnumerable<Coordinates> coordinates)
+    public async Task OnTileOnBoardDragged(object sender, TileOnBoardEventArgs eventArgs)
     {
-        BoardLimit.Update(coordinates);
-        return BoardLimit;
+        Console.WriteLine("AreaManager: tile dragged out board");
+        BoardLimit.Reduce(eventArgs.Coordinate);
+        await UpdateBoardSquareSizeAsync();
     }
 
-    public async Task UpdateBoardSquareSizeAsync()
+    private async Task UpdateBoardSquareSizeAsync()
     {
         var dimension = await GetSquareDimensionAsync(BoardLimit);
         BoardSquareSize = $"height:{dimension.Height}px; width:{dimension.Width}px;";
     }
 
-
     private async Task<AreaDimension> GetSquareDimensionAsync(BoardLimit boardLimit)
     {
-        _boardDimension = await ComputeBoardDimensionAsync();
+        var boardDimension = await ComputeBoardDimensionAsync();
         var columnNumber = boardLimit.ColumnNumber;
         var lineNumber = boardLimit.LinesNumber;
-        var maxWidth = _boardDimension.Width / columnNumber;
-        var maxHeight = _boardDimension.Height / lineNumber;
+        var maxWidth = boardDimension.Width / columnNumber;
+        var maxHeight = boardDimension.Height / lineNumber;
         var widthHeight = Math.Min(maxWidth, maxHeight);
-        return new AreaDimension { Width = widthHeight, Height = widthHeight };
+        return new AreaDimension(widthHeight, widthHeight);
     }
 
     private async Task<AreaDimension> ComputeBoardDimensionAsync()
@@ -66,5 +62,4 @@ public class AreaManager : IAreaManager
     }
 
     private async Task<AreaDimension> GetWindowDimensionAsync() => await _jsRuntime.InvokeAsync<AreaDimension>("getWindowDimensions");
-
 }

@@ -3,6 +3,7 @@
 public abstract class WebApiBase
 {
     protected readonly HttpClient _httpClient;
+    protected const string ApiPrefix = "api";
 
     protected WebApiBase(HttpClient httpClient)
     {

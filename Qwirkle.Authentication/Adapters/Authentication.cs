@@ -1,6 +1,4 @@
-﻿using Qwirkle.Domain.Services;
-
-namespace Qwirkle.Authentication.Adapters;
+﻿namespace Qwirkle.Authentication.Adapters;
 
 public class Authentication : IAuthentication
 {

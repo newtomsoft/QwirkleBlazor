@@ -6,22 +6,22 @@ public class WebApiAction : WebApiBase, IApiAction
 
     public WebApiAction(HttpClient httpClient) : base(httpClient) { }
 
-    public async Task<PlayReturn> PlayTiles(List<TileModel> tiles)
+    public async Task<PlayReturn> PlayTiles(List<PlayTileModel> tiles)
     {
-        var response = await _httpClient.PostAsJsonAsync($"api/{ControllerName}/PlayTiles", tiles);
+        var response = await _httpClient.PostAsJsonAsync($"{ApiPrefix}/{ControllerName}/PlayTiles", tiles);
         if (response.StatusCode == HttpStatusCode.BadRequest) throw new Exception(await response.Content.ReadAsStringAsync());
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<PlayReturn>();
     }
 
-    public Task PlayTilesSimulation(List<TileModel> tiles)
+    public Task PlayTilesSimulation(List<PlayTileModel> tiles)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<SwapTilesReturn> SwapTiles(List<TileModel> tiles)
+    public async Task<SwapTilesReturn> SwapTiles(List<SwapTileModel> tiles)
     {
-        var response = await _httpClient.PostAsJsonAsync($"api/{ControllerName}/SwapTiles", tiles);
+        var response = await _httpClient.PostAsJsonAsync($"{ApiPrefix}/{ControllerName}/SwapTiles", tiles);
         if (response.StatusCode == HttpStatusCode.BadRequest) throw new Exception(await response.Content.ReadAsStringAsync());
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<SwapTilesReturn>();
@@ -29,19 +29,17 @@ public class WebApiAction : WebApiBase, IApiAction
 
     public async Task<SkipTurnReturn> SkipTurn(SkipTurnModel skipTurnModel)
     {
-        var response = await _httpClient.PostAsJsonAsync($"api/{ControllerName}/SkipTurn", skipTurnModel);
+        var response = await _httpClient.PostAsJsonAsync($"{ApiPrefix}/{ControllerName}/SkipTurn", skipTurnModel);
         if (response.StatusCode == HttpStatusCode.BadRequest) throw new Exception(await response.Content.ReadAsStringAsync());
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<SkipTurnReturn>();
     }
 
-    public Task ArrangeRack(List<TileModel> tiles)
+    public async Task<ArrangeRackReturn> ArrangeRack(List<ArrangeTileModel> tiles)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task<UserInfo?> GetUserInfo()
-    {
-        throw new NotImplementedException();
+        var response = await _httpClient.PostAsJsonAsync($"{ApiPrefix}/{ControllerName}/ArrangeRack", tiles);
+        if (response.StatusCode == HttpStatusCode.BadRequest) throw new Exception(await response.Content.ReadAsStringAsync());
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<ArrangeRackReturn>();
     }
 }

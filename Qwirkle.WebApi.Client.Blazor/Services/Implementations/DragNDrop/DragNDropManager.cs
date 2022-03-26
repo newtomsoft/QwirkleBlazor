@@ -2,19 +2,40 @@
 
 public class DragNDropManager : IDragNDropManager
 {
-    private readonly IAreaManager _areaManager;
-    public HashSet<DropItem> AllTilesInGame { get; } = new();
-    public HashSet<DropItem> TilesDroppedInBoard { get; } = new();
-    public HashSet<DropItem> TilesDroppedInBag { get; } = new();
+    public HashSet<DropItem> AllTilesInGame
+    {
+        get
+        {
+            var allTiles = new HashSet<DropItem>();
+            allTiles.UnionWith(_tilesFixedInBoard);
+            allTiles.UnionWith(TilesDroppedOnRack);
+            allTiles.UnionWith(TilesDroppedOnBoard);
+            allTiles.UnionWith(TilesDroppedOnBag);
+            return allTiles;
+        }
+    }
 
-    private readonly List<DropItem> _tilesDroppedInRack = new();
+    public HashSet<DropItem> AllPlayerTiles
+    {
+        get
+        {
+            var tiles = new HashSet<DropItem>();
+            tiles.UnionWith(TilesDroppedOnRack);
+            tiles.UnionWith(TilesDroppedOnBoard);
+            tiles.UnionWith(TilesDroppedOnBag);
+            return tiles;
+        }
+    }
+
+    public HashSet<DropItem> TilesDroppedOnBoard { get; } = new();
+    public HashSet<DropItem> TilesDroppedOnBag { get; } = new();
+    public List<DropItem> TilesDroppedOnRack { get; } = new();
+
+    private readonly HashSet<DropItem> _tilesFixedInBoard = new();
     private readonly List<string> _dropZoneIdentifiersTaken = new();
 
-
-    private Action _stateHasChanged;
-
-    private Board _board;
-    private Rack _rack;
+    public event EventHandler<TileOnBoardEventArgs> TileOnBoardDropped;
+    public event EventHandler<TileOnBoardEventArgs> TileOnBoardDragged;
 
     private const string BagIdentifierPrefix = "bag";
     private const string RackIdentifierPrefix = "rack";
@@ -23,41 +44,23 @@ public class DragNDropManager : IDragNDropManager
 
     public DragNDropManager(IAreaManager areaManager)
     {
-        _areaManager = areaManager;
-        TileInBoardDropped += (source, eventArgs) => _areaManager.OnTileInBoardDropped(source, eventArgs);
+        TileOnBoardDropped += (source, eventArgs) => areaManager.OnTileOnBoardDropped(source!, eventArgs);
+        TileOnBoardDragged += (source, eventArgs) => areaManager.OnTileOnBoardDragged(source!, eventArgs);
     }
 
-
-    public async Task OnBoardChanged(object source, BoardChangedEventArgs eventArgs)
+    public void Initialize()
     {
-        Console.WriteLine("DragNDrop: board changed");
-        foreach (var tile in eventArgs.Board.Tiles)
-        {
-            Console.WriteLine($"{tile.Shape} {tile.Color} {tile.Coordinates}");
-        }
-        _board = eventArgs.Board;
-        UpdateDropZones();
+        TilesDroppedOnBoard.Clear();
+        TilesDroppedOnRack.Clear();
+        TilesDroppedOnBag.Clear();
+        _tilesFixedInBoard.Clear();
+        _dropZoneIdentifiersTaken.Clear();
     }
 
-    public event EventHandler<TileInBoardDroppedEventArgs> TileInBoardDropped = default!;
-    protected virtual void OnTileInBoardDropped(Coordinates coordinates)
-    {
-        TileInBoardDropped.Invoke(this, new TileInBoardDroppedEventArgs() { Coordinates = coordinates });
-    }
+    public void OnTilesOnBoardPlayed(object source, TilesOnBoardPlayedEventArgs eventArgs) => FixTilesOnBoard(eventArgs.TilesOnBoard);
 
-    public void OnRackChanged(object source, RackChangedEventArgs eventArgs)
-    {
-        Console.WriteLine("DragNDrop: rack changed");
-        _rack = eventArgs.Rack;
-        UpdateDropZones();
-    }
+    public void OnTilesOnRackChanged(object source, TilesOnRackChangedEventArgs eventArgs) => UpdateRack(eventArgs.TilesOnRack);
 
-    public void Initialize(Action stateHasChanged)
-    {
-        _stateHasChanged = stateHasChanged;
-        UpdateDropZones();
-    }
-    
     public bool IsDisabled(DropItem item)
     {
         var result = _dropZoneIdentifiersTaken.Contains(item.Identifier);
@@ -71,29 +74,30 @@ public class DragNDropManager : IDragNDropManager
         var (dropItem, dropZoneIdentifier) = mudItemDropInfo;
         var fromDropZone = dropItem.DropZone;
         dropItem.Identifier = dropZoneIdentifier;
-        if (fromDropZone == DropZone.Board && _areaManager.BoardLimit.Reduce(dropItem.Coordinates, _board.Tiles.Select(t => t.Coordinates), TilesDroppedInBoard.Select(t => t.Coordinates)))
-            _stateHasChanged();
-
+        if (fromDropZone == DropZone.Board) OnTileOnBoardDragged(dropItem.Coordinate);
         dropItem.DropZone = DropInZone(dropZoneIdentifier);
         switch (dropItem.DropZone)
         {
             case DropZone.Board:
-                TilesDroppedInBoard.Add(dropItem);
-                _tilesDroppedInRack.Remove(dropItem);
-                TilesDroppedInBag.Remove(dropItem);
-                dropItem.Coordinates = ToCoordinate(dropItem.Identifier);
-                _stateHasChanged();
-                OnTileInBoardDropped(dropItem.Coordinates);
+                TilesDroppedOnBoard.Add(dropItem);
+                TilesDroppedOnRack.RemoveAll(t => t.Tile == dropItem.Tile);
+                TilesDroppedOnBag.RemoveWhere(t => t.Tile == dropItem.Tile);
+                dropItem.Coordinate = ToCoordinate(dropItem.Identifier);
+                OnTileOnBoardDropped(dropItem.Coordinate);
                 return;
             case DropZone.Rack:
-                _tilesDroppedInRack.Add(dropItem);
-                TilesDroppedInBoard.Remove(dropItem);
-                TilesDroppedInBag.Remove(dropItem);
+                TilesDroppedOnRack.RemoveAll(t => t.Tile == dropItem.Tile);
+                var rackPositionTo = ToRackPosition(dropItem.Identifier);
+                SwapRackPosition(dropItem.RackPosition, rackPositionTo);
+                dropItem.RackPosition = rackPositionTo;
+                TilesDroppedOnRack.Add(dropItem);
+                TilesDroppedOnBoard.RemoveWhere(t => t.Tile == dropItem.Tile);
+                TilesDroppedOnBag.RemoveWhere(t => t.Tile == dropItem.Tile);
                 return;
             case DropZone.Bag:
-                TilesDroppedInBag.Add(dropItem);
-                _tilesDroppedInRack.Remove(dropItem);
-                TilesDroppedInBoard.Remove(dropItem);
+                TilesDroppedOnBag.Add(dropItem);
+                TilesDroppedOnRack.RemoveAll(t => t.Tile == dropItem.Tile);
+                TilesDroppedOnBoard.RemoveWhere(t => t.Tile == dropItem.Tile);
                 return;
             case DropZone.Undefined:
             default:
@@ -101,40 +105,54 @@ public class DragNDropManager : IDragNDropManager
         }
     }
 
-    public string ToBoardIdentifier(Coordinates coordinates) => $"{BoardIdentifierPrefix}{Separator}{coordinates.X}{Separator}{coordinates.Y}";
+    private void SwapRackPosition(byte rackPositionFrom, byte rackPositionTo)
+    {
+        var item = AllTilesInGame.FirstOrDefault(t => t.RackPosition == rackPositionTo);
+        if (item is null) return;
+        item.RackPosition = rackPositionFrom;
+    }
+
+    public string ToBoardIdentifier(Coordinate coordinate) => $"{BoardIdentifierPrefix}{Separator}{coordinate.X}{Separator}{coordinate.Y}";
     public string ToRackIdentifier(int rackIndex) => $"{RackIdentifierPrefix}{Separator}{rackIndex}";
     public string ToBagIdentifier(int bagIndex) => $"{BagIdentifierPrefix}{Separator}{bagIndex}";
 
-    public void UpdateDropZones()
+    private void FixTilesOnBoard(IEnumerable<TileOnBoard> tilesOnBoard)
     {
-        AllTilesInGame.Clear();
-        TilesDroppedInBag.Clear();
-        TilesDroppedInBoard.Clear();
-        _tilesDroppedInRack.Clear();
-        _dropZoneIdentifiersTaken.Clear();
-        var rackIndex = 0;
-        foreach (var tile in _rack.Tiles.OrderBy(t => t.RackPosition))
+        var addedTiles = tilesOnBoard.ToHashSet();
+        var tilesAtSamePlaceThanAddedTiles = AllTilesInGame.Where(t => addedTiles.Select(t2 => t2.Coordinate).Contains(t.Coordinate)).ToHashSet();
+        TilesDroppedOnBoard.ExceptWith(tilesAtSamePlaceThanAddedTiles);
+        foreach (var tile in addedTiles)
         {
-            var droppedTile = new DropItem { Tile = tile, Identifier = ToRackIdentifier(rackIndex), DropZone = DropZone.Rack };
-            AllTilesInGame.Add(droppedTile);
-            _tilesDroppedInRack.Add(droppedTile);
-            //todo remove tempI and use RackPosition when RackPosition ok
-            rackIndex++;
-        }
-        foreach (var tile in _board.Tiles)
-        {
-            var identifier = ToBoardIdentifier(tile.Coordinates);
-            AllTilesInGame.Add(new DropItem { Tile = tile, Identifier = identifier, Coordinates = tile.Coordinates, DropZone = DropZone.Board });
+            var identifier = ToBoardIdentifier(tile.Coordinate);
+            _tilesFixedInBoard.Add(new DropItem { Tile = tile, Identifier = identifier, Coordinate = tile.Coordinate, DropZone = DropZone.Board });
             _dropZoneIdentifiersTaken.Add(identifier);
         }
     }
 
-    private static Coordinates ToCoordinate(string dropItemIdentifier)
+    private void UpdateRack(IEnumerable<TileOnRack> tilesOnRack)
+    {
+        TilesDroppedOnBag.Clear();
+        TilesDroppedOnRack.Clear();
+        foreach (var tile in tilesOnRack)
+        {
+            var droppedTile = new DropItem { Tile = tile, Identifier = ToRackIdentifier(tile.RackPosition), DropZone = DropZone.Rack, RackPosition = tile.RackPosition };
+            AllTilesInGame.Add(droppedTile);
+            TilesDroppedOnRack.Add(droppedTile);
+        }
+    }
+
+    private static Coordinate ToCoordinate(string dropItemIdentifier)
     {
         var spited = dropItemIdentifier.Split(Separator);
         var x = int.Parse(spited[1]);
         var y = int.Parse(spited[2]);
-        return Coordinates.From(x, y);
+        return Coordinate.From(x, y);
+    }
+
+    private static RackPosition ToRackPosition(string dropItemIdentifier)
+    {
+        var spited = dropItemIdentifier.Split(Separator);
+        return (RackPosition)int.Parse(spited[1]);
     }
 
     private static DropZone DropInZone(string dropZoneIdentifier)
@@ -144,9 +162,7 @@ public class DragNDropManager : IDragNDropManager
         if (dropZoneIdentifier.StartsWith(BagIdentifierPrefix)) return DropZone.Bag;
         return DropZone.Undefined;
     }
-}
 
-public class TileInBoardDroppedEventArgs : EventArgs
-{
-    public Coordinates Coordinates { get; set; }
+    private void OnTileOnBoardDropped(Coordinate coordinate) => TileOnBoardDropped.Invoke(this, new TileOnBoardEventArgs(coordinate));
+    private void OnTileOnBoardDragged(Coordinate coordinate) => TileOnBoardDragged.Invoke(this, new TileOnBoardEventArgs(coordinate));
 }

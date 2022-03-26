@@ -119,7 +119,7 @@ public sealed class GameScraper
 
     public int GetOpponentPoints() => _webDriver.FindElement(By.Id("score_computer")).TextToInt();
 
-    public List<TileOnPlayer> GetTilesOnPlayer() => TilesOnPlayerCodes().Select(positionTile => new TileOnPlayer(positionTile.Key, positionTile.Value.ToTile())).ToList();
+    public List<TileOnRack> GetTilesOnPlayer() => TilesOnPlayerCodes().Select(positionTile => new TileOnRack(positionTile.Key, positionTile.Value.ToTile())).ToList();
 
     /// <returns>0 tiles if error</returns>
     public HashSet<TileOnBoard> GetTilesPlayedByOpponent()
@@ -132,7 +132,7 @@ public sealed class GameScraper
             {
                 var fullImageName = domImageTile.GetAttribute("src");
                 var domTile = domImageTile.FindElement(By.XPath("./.."));
-                var coordinates = Coordinates.From(int.Parse(domTile.GetAttribute("mapx")), int.Parse(domTile.GetAttribute("mapy")));
+                var coordinates = Coordinate.From(int.Parse(domTile.GetAttribute("mapx")), int.Parse(domTile.GetAttribute("mapy")));
                 tilesOnBoard.Add(TileOnBoard.From(GetImageCode(fullImageName).ToTile(), coordinates));
             }
             catch (Exception exception)
@@ -153,7 +153,7 @@ public sealed class GameScraper
             try
             {
                 var fullImageName = domTile.FindElement(By.TagName("img")).GetAttribute("src");
-                var coordinates = Coordinates.From(int.Parse(domTile.GetAttribute("mapx")), int.Parse(domTile.GetAttribute("mapy")));
+                var coordinates = Coordinate.From(int.Parse(domTile.GetAttribute("mapx")), int.Parse(domTile.GetAttribute("mapy")));
                 tilesOnBoard.Add(TileOnBoard.From(GetImageCode(fullImageName).ToTile(), coordinates));
             }
             catch
@@ -275,7 +275,7 @@ public sealed class GameScraper
         foreach (var tile in tiles)
         {
             var elementFrom = FindElementMoveFrom(tile, playerTilesCodes);
-            var elementTo = FindElementMoveTo(tile.Coordinates);
+            var elementTo = FindElementMoveTo(tile.Coordinate);
             try
             {
                 DragAndDrop(elementFrom!, elementTo);
@@ -332,7 +332,7 @@ public sealed class GameScraper
         }
     }
 
-    private IWebElement FindElementMoveTo(Coordinates coordinates) => _webDriver.FindElement(By.Id($"x{coordinates.X}y{coordinates.Y}"));
+    private IWebElement FindElementMoveTo(Coordinate coordinate) => _webDriver.FindElement(By.Id($"x{coordinate.X}y{coordinate.Y}"));
 
     private void DragAndDrop(IWebElement fromElement, IWebElement toElement) => new Actions(_webDriver).DragAndDrop(fromElement, toElement).Build().Perform();
     private static UltraBoardGamesTileImageCode GetImageCode(string fullImageName) => new(GetStringImageCode(fullImageName));

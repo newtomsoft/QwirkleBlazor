@@ -5,7 +5,7 @@ public class UltraBoardGamesPlayerApplication
     private readonly ILogger<UltraBoardGamesPlayerApplication> _logger;
     private readonly BotService _botService;
     private readonly IWebDriverFactory _webDriverFactory;
-    private readonly Coordinates _originCoordinates = Coordinates.From(25, 25);
+    private readonly Coordinate _originCoordinate = Coordinate.From(25, 25);
     private readonly List<GameScraper> _parallelScrapers = new();
     private const int ParallelScrapersNumber = 6;
 
@@ -36,7 +36,7 @@ public class UltraBoardGamesPlayerApplication
         gameScraper.GoToGame();
         gameScraper.AcceptPolicies();
         gameScraper.CleanWindow();
-        var board = Board.Empty();
+        var board = Board.Empty;
         GameStatus gameStatus;
         var lastTilesPlayedByOpponent = new HashSet<TileOnBoard>();
         int playerPoints = 0, opponentPoints = 0;
@@ -58,7 +58,7 @@ public class UltraBoardGamesPlayerApplication
             var opponent = Player(opponentPoints, tilesOnPlayer, false);
             var players = new List<Domain.Entities.Player> { bot, opponent };
             var game = new Game(board, players, tilesNumberOnBag);
-            var move = board.Tiles.Count > 0 ? _botService.GetBestMove(bot, game) : _botService.GetBestMove(bot, game, _originCoordinates);
+            var move = board.Tiles.Count > 0 ? _botService.GetBestMove(bot, game) : _botService.GetBestMove(bot, game, _originCoordinate);
 
             gameScraper.TakeScreenShot();
             if (move.TilesNumber == 0)
@@ -96,7 +96,7 @@ public class UltraBoardGamesPlayerApplication
         do
         {
             var firstTilesToPlay = boardCopy.Tiles.Count == 0
-                ? tilesToPlayStillHere.Where(tile => tile.Coordinates == _originCoordinates).ToList()
+                ? tilesToPlayStillHere.Where(tile => tile.Coordinate == _originCoordinate).ToList()
                 : tilesToPlayStillHere.Where(tile => boardCopy.IsIsolatedTile(tile)).ToList();
             otherTilesToPlay = tilesToPlayStillHere.Except(firstTilesToPlay).ToList();
             tilesToPlayOrdered.AddRange(firstTilesToPlay);
@@ -130,5 +130,5 @@ public class UltraBoardGamesPlayerApplication
         return tilesPlayedByOpponent;
     }
 
-    private static Domain.Entities.Player Player(int playerPoints, List<TileOnPlayer> tilesOnPlayer, bool isTurn) => new(0, 0, 0, "", 0, playerPoints, 0, Rack.From(tilesOnPlayer), isTurn, false);
+    private static Domain.Entities.Player Player(int playerPoints, List<TileOnRack> tilesOnPlayer, bool isTurn) => new(0, 0, 0, "", 0, playerPoints, 0, Rack.From(tilesOnPlayer), isTurn, false);
 }

@@ -2,11 +2,10 @@
 
 public interface IAreaManager
 {
-    Task OnTileInBoardDropped(object sender, TileInBoardDroppedEventArgs eventArgs);
-    
+    Task OnTilesOnBoardPlayed(object source, TilesOnBoardPlayedEventArgs eventArgs);
+    Task OnTileOnBoardDropped(object sender, TileOnBoardEventArgs eventArgs);
+    Task OnTileOnBoardDragged(object sender, TileOnBoardEventArgs eventArgs);
+
     BoardLimit BoardLimit { get; }
     string BoardSquareSize { get; }
-
-    Task OnBoardChanged(object source, BoardChangedEventArgs eventArgs);
-    Task UpdateBoardSquareSizeAsync();
 }

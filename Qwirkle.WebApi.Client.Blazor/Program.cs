@@ -4,8 +4,6 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddQwirkleMudServices();
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();
-builder.Services.AddOptions();
-builder.Services.AddAuthorizationCore();
 builder.Services.AddSingleton(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddSingleton<IdentityAuthenticationStateProvider>();
 builder.Services.AddSingleton<AuthenticationStateProvider>(s => s.GetRequiredService<IdentityAuthenticationStateProvider>());
@@ -18,8 +16,8 @@ builder.Services.AddSingleton<INotificationInstantGame, SignalRNotificationInsta
 builder.Services.AddSingleton<INotificationGame, SignalRNotificationGame>();
 builder.Services.AddSingleton<IAreaManager, AreaManager>();
 builder.Services.AddSingleton<IDragNDropManager, DragNDropManager>();
-builder.Services.AddScoped<INotificationReceiver, NoNotificationReceiver>();
-//builder.Services.AddScoped<INotificationReceiver, NotificationReceiver>();
+builder.Services.AddScoped<INotificationReceiver, NotificationReceiver>();
+builder.Services.AddScoped<IPlayersInfo, PlayersInfo>();
 
 var host = builder.Build();
 var jsRuntime = host.Services.GetRequiredService<IJSRuntime>();

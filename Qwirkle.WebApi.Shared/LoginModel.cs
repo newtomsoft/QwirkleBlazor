@@ -1,5 +1,6 @@
 ﻿namespace Qwirkle.WebApi.Shared;
 
+[Serializable]
 public class LoginModel
 {
     [Required]

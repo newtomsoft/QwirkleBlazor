@@ -1,4 +1,4 @@
-﻿namespace Qwirkle.Web.Api.Controllers;
+﻿namespace Qwirkle.WebApi.Server.Controllers;
 
 [ApiController]
 [Authorize]
@@ -33,11 +33,11 @@ public class InstantGameController : ControllerBase
         if (usersNames.Count != playersNumberForStartGame)
         {
             if (instantGameResult.IsAdded) _notification.SendInstantGameJoined(playersNumberForStartGame, UserName);
-            return Ok(new InstantGameModel { IsAdded = instantGameResult.IsAdded, GameId = 0, UsersNames = usersNames.ToArray() });
+            return Ok(new InstantGameModel(instantGameResult.IsAdded, usersNames.ToArray()));
         }
         var usersIds = usersNames.Select(userName => _infoService.GetUserId(userName)).ToHashSet();
         var gameId = _coreService.CreateGameWithUsersIds(usersIds);
         _notification.SendInstantGameStarted(playersNumberForStartGame, gameId);
-        return Ok(new InstantGameModel { IsAdded = instantGameResult.IsAdded, GameId = gameId, UsersNames = usersNames.ToArray() });
+        return Ok(new InstantGameModel(instantGameResult.IsAdded, usersNames.ToArray(), gameId));
     }
 }

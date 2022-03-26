@@ -1,4 +1,4 @@
-﻿namespace Qwirkle.Web.Api.Controllers;
+﻿namespace Qwirkle.WebApi.Server.Controllers;
 
 [ApiController]
 [Authorize]
@@ -19,19 +19,18 @@ public class GameController : ControllerBase
         _userManager = userManager;
     }
 
-
     [HttpPost("New")]
-    public ActionResult CreateGame(HashSet<string> usersNames)
+    public ActionResult CreateGame(OpponentsModel opponentsModel)
     {
-        var usersIdsList = new List<int> { UserId };
-        usersIdsList.AddRange(usersNames.Select(userName => _infoService.GetUserId(userName)));
+        var usersIdsList = new List<int> { UserId, };
+        if (!string.IsNullOrEmpty(opponentsModel.Opponent1)) usersIdsList.Add(_infoService.GetUserId(opponentsModel.Opponent1));
+        if (opponentsModel.Opponent2 is not null) usersIdsList.Add(_infoService.GetUserId(opponentsModel.Opponent2));
+        if (opponentsModel.Opponent3 is not null) usersIdsList.Add(_infoService.GetUserId(opponentsModel.Opponent3));
         usersIdsList.RemoveAll(id => id == 0);
         var usersIds = new HashSet<int>(usersIdsList);
-        if (!usersIds.Contains(UserId)) return BadRequest("user not in the game");
         var gameId = _coreService.CreateGameWithUsersIds(usersIds);
         return Ok(gameId);
     }
-
 
     [HttpGet("{gameId:int}")]
     public ActionResult GetGame(int gameId)

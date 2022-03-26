@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Qwirkle.Infra.Repository.Adapters;
+﻿namespace Qwirkle.Infra.Repository.Adapters;
 
 public class Repository : IRepository
 {
@@ -83,27 +81,47 @@ public class Repository : IRepository
         _dbContext.SaveChanges();
     }
 
-    public void ArrangeRack(Player player, IEnumerable<Tile> tiles)
+    public void ArrangeRack(Player player, IEnumerable<TileOnRack> tiles)
     {
-        var tilesList = tiles.ToList();
-        for (byte i = 0; i < tilesList.Count; i++)
+        var tilesToChangePosition = _dbContext.TilesOnRack.Include(t => t.Tile).Where(t => t.PlayerId == player.Id).ToList();
+        foreach (var (rackPosition, tileColor, tileShape) in tiles)
         {
-            var tile = _dbContext.TilesOnPlayer.Include(t => t.Tile).First(tp => tp.PlayerId == player.Id && tp.Tile.Color == tilesList[i].Color && tp.Tile.Shape == tilesList[i].Shape);
-            tile.RackPosition = i;
+            var tileToChangePosition = tilesToChangePosition.First(t => t.Tile.Color == tileColor && t.Tile.Shape == tileShape);
+            tileToChangePosition.RackPosition = rackPosition;
+            tilesToChangePosition.RemoveAll(t => t.Id == tileToChangePosition.Id);
         }
         _dbContext.SaveChanges();
+        FixRackPosition(player.Id);
     }
 
-    public void TilesFromBagToPlayer(Player player, List<byte> positionsInRack)
+    public void TilesFromBagToPlayer(Player player, IEnumerable<Tile> tilesToSwap)
     {
-        var tilesNumber = positionsInRack.Count;
+        var tilesToSwapArray = tilesToSwap.ToArray();
+        var tilesNumber = tilesToSwapArray.Length;
         var tilesToGiveToPlayer = _dbContext.TilesOnBag.Include(t => t.Tile).Where(t => t.GameId == player.GameId).AsEnumerable().OrderBy(_ => Guid.NewGuid()).Take(tilesNumber).ToList();
         _dbContext.TilesOnBag.RemoveRange(tilesToGiveToPlayer);
+
         for (var i = 0; i < tilesToGiveToPlayer.Count; i++)
         {
-            var tileOnPlayerDao = tilesToGiveToPlayer[i].ToTileOnPlayerDao(positionsInRack[i], player.Id);
-            _dbContext.TilesOnPlayer.Add(tileOnPlayerDao);
-            player.Rack.Tiles.Add(tileOnPlayerDao.ToTileOnPlayer());
+            var (color, shape) = tilesToSwapArray[i];
+            var rackPosition = _dbContext.TilesOnRack.Include(t => t.Tile).First(t => t.PlayerId == player.Id && t.Tile.Color == color && t.Tile.Shape == shape).RackPosition;
+            var tileOnPlayerDao = tilesToGiveToPlayer[i].ToTileOnRackDao(rackPosition, player.Id);
+            _dbContext.TilesOnRack.Add(tileOnPlayerDao);
+            player.Rack.Tiles.Add(tileOnPlayerDao.ToTileOnRack());
+        }
+        FixRackPosition(player.Id);
+    }
+
+    public void TilesFromBagToPlayer(Player player)
+    {
+        var tilesToGiveToPlayer = _dbContext.TilesOnBag.Include(t => t.Tile).Where(t => t.GameId == player.GameId).AsEnumerable().OrderBy(_ => Guid.NewGuid()).Take(CoreService.TilesNumberPerPlayer).ToList();
+        _dbContext.TilesOnBag.RemoveRange(tilesToGiveToPlayer);
+
+        for (var i = 0; i < CoreService.TilesNumberPerPlayer; i++)
+        {
+            var tileOnPlayerDao = tilesToGiveToPlayer[i].ToTileOnRackDao((byte)i, player.Id);
+            _dbContext.TilesOnRack.Add(tileOnPlayerDao);
+            player.Rack.Tiles.Add(tileOnPlayerDao.ToTileOnRack());
         }
         _dbContext.SaveChanges();
     }
@@ -115,8 +133,8 @@ public class Repository : IRepository
 
         foreach (var tile in tiles)
         {
-            var tileOnPlayerDao = _dbContext.TilesOnPlayer.Include(t => t.Tile).First(t => t.PlayerId == player.Id && t.Tile.Color == tile.Color && t.Tile.Shape == tile.Shape);
-            _dbContext.TilesOnPlayer.Remove(tileOnPlayerDao);
+            var tileOnPlayerDao = _dbContext.TilesOnRack.Include(t => t.Tile).First(t => t.PlayerId == player.Id && t.Tile.Color == tile.Color && t.Tile.Shape == tile.Shape);
+            _dbContext.TilesOnRack.Remove(tileOnPlayerDao);
             _dbContext.TilesOnBag.Add(tileOnPlayerDao.ToTileOnBagDao(player.GameId));
             _dbContext.SaveChanges();
         }
@@ -127,8 +145,8 @@ public class Repository : IRepository
         var game = _dbContext.Games.Single(g => g.Id == gameId);
         game.LastPlayDate = DateTime.UtcNow;
         var tiles = tilesOnBoard.ToList();
-        foreach (var tile in tiles) _dbContext.TilesOnBoard.Add(_dbContext.TilesOnPlayer.Include(t => t.Tile).First(tp => tp.PlayerId == playerId && tp.Tile.Color == tile.Color && tp.Tile.Shape == tile.Shape).ToTileOnBoardDao(tile.Coordinates));
-        foreach (var tile in tiles) _dbContext.TilesOnPlayer.Remove(_dbContext.TilesOnPlayer.Include(t => t.Tile).First(tp => tp.PlayerId == playerId && tp.Tile.Color == tile.Color && tp.Tile.Shape == tile.Shape));
+        foreach (var tile in tiles) _dbContext.TilesOnBoard.Add(_dbContext.TilesOnRack.Include(t => t.Tile).First(tp => tp.PlayerId == playerId && tp.Tile.Color == tile.Color && tp.Tile.Shape == tile.Shape).ToTileOnBoardDao(tile.Coordinate));
+        foreach (var tile in tiles) _dbContext.TilesOnRack.Remove(_dbContext.TilesOnRack.Include(t => t.Tile).First(tp => tp.PlayerId == playerId && tp.Tile.Color == tile.Color && tp.Tile.Shape == tile.Shape));
         _dbContext.SaveChanges();
     }
 
@@ -155,12 +173,6 @@ public class Repository : IRepository
 
     public bool IsGameOver(int gameId) => _dbContext.Games.Any(g => g.Id == gameId && g.GameOver);
 
-    private List<TileOnBoard> TilesOnBoardDaoToEntity(IReadOnlyCollection<TileOnBoardDao> tilesOnBoard)
-    {
-        var tilesDao = _dbContext.Tiles.Where(t => tilesOnBoard.Select(tb => tb.TileId).Contains(t.Id)).ToList();
-        return (from tileDao in tilesDao let tileOnBoardDao = tilesOnBoard.First(tb => tb.TileId == tileDao.Id) select new TileOnBoard(tileDao.Color, tileDao.Shape, new Coordinates(tileOnBoardDao.PositionX, tileOnBoardDao.PositionY))).ToList();
-    }
-
     public bool AddBookmarkedOpponent(int userId, string opponentName)
     {
         var user = _dbContext.Users.Include(u => u.BookmarkedOpponents).First(u => u.Id == userId);
@@ -183,6 +195,22 @@ public class Repository : IRepository
     {
         var opponents = _dbContext.Users.Include(u => u.BookmarkedOpponents).First(u => u.Id == userId).BookmarkedOpponents;
         return opponents.Select(o => o.UserName).ToHashSet();
+    }
+
+    private IEnumerable<TileOnBoard> TilesOnBoardDaoToEntity(IReadOnlyCollection<TileOnBoardDao> tilesOnBoard)
+    {
+        var tilesDao = _dbContext.Tiles.Where(t => tilesOnBoard.Select(tb => tb.TileId).Contains(t.Id)).ToList();
+        return from tileDao in tilesDao let tileOnBoardDao = tilesOnBoard.First(tb => tb.TileId == tileDao.Id) select new TileOnBoard(tileDao.Color, tileDao.Shape, new Coordinate(tileOnBoardDao.PositionX, tileOnBoardDao.PositionY));
+    }
+
+    private void FixRackPosition(int playerId)
+    {
+        var playerTiles = _dbContext.TilesOnRack.Include(t => t.Tile).Where(t => t.PlayerId == playerId).ToList();
+        var distinctCount = playerTiles.DistinctBy(t => t.RackPosition).Count();
+        if (distinctCount == playerTiles.Count) return;
+
+        for (var i = 0; i < playerTiles.Count; i++) playerTiles[i].RackPosition = (RackPosition)i;
+        _dbContext.SaveChanges();
     }
 }
 

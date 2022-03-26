@@ -2,79 +2,82 @@
 
 public class NotificationReceiver : INotificationReceiver
 {
-    private readonly IDragNDropManager _dragNDropManager = default!;
-    private readonly ISnackbar _snackBar = default!;
-    private Game _game = default!;
-    private Action _stateHasChanged = default!;
-    private Player _currentPlayer = default!;
-    private BoardLimit _boardLimit;
-    private string PlayerName(int playerId) => _game.Players.Single(p => p.Id == playerId).Pseudo;
+    private event EventHandler<TilesOnBoardPlayedEventArgs> TilesOnBoardPlayed;
+    private event EventHandler<PlayerTurnChangedEventArgs> PlayerTurnChanged;
+    private event EventHandler<PlayerPointsChangedEventArgs> PlayerPointsChanged;
+    private readonly ISnackbar _snackBar;
+    private int _playerId;
+    private Dictionary<int, string> _playersNames = default!;
 
-    public NotificationReceiver(ISnackbar snackBar, IDragNDropManager dragNDropManager)
+    public NotificationReceiver(ISnackbar snackBar, IDragNDropManager dragNDropManager, IAreaManager areaManager, IPlayersInfo playersInfo)
     {
         _snackBar = snackBar;
-        _dragNDropManager = dragNDropManager;
+        TilesOnBoardPlayed += dragNDropManager.OnTilesOnBoardPlayed!;
+        TilesOnBoardPlayed += (source, eventArgs) => areaManager.OnTilesOnBoardPlayed(source!, eventArgs);
+        PlayerTurnChanged += playersInfo.OnPlayerTurnChanged!;
+        PlayerPointsChanged += playersInfo.OnPlayerPointsChanged!;
     }
 
-    public void Initialize(Game game, Player currentPlayer, BoardLimit boardLimit, Action stateHaveChange)
+    public void Initialize(Dictionary<int, string> idPlayerNameDictionary, int playerId, Action stateHaveChange)
     {
-        _game = game;
-        _stateHasChanged = stateHaveChange;
-        _boardLimit = boardLimit;
-        _currentPlayer = currentPlayer;
+        _playersNames = idPlayerNameDictionary;
+        _playerId = playerId;
     }
+
 
     public void TilesPlayed(int playerId, Move move)
     {
-        var (tileOnBoards, points) = move;
-        _game.Board.Tiles.UnionWith(tileOnBoards);
-        //_boardLimit.Update();
-        //_dragNDropManager.UpdateBoardLimitAndSquareSizeAsync(_game.Board.Tiles.Select(t => t.Coordinates));
-        _dragNDropManager.UpdateDropZones(); //todo do better
-        //_areaManager.
-        _stateHasChanged();
-        if (_currentPlayer.Id != playerId) _snackBar.Add($"{PlayerName(playerId)} has played {tileOnBoards.Count} tiles and got {points} points");
+        if (_playerId == playerId) return;
+
+        var (tilesOnBoard, points) = move;
+        _snackBar.Add($"{_playersNames[playerId]} has played {tilesOnBoard.Count} tiles and got {points} points");
+        OnTilesOnBoardAdded(move.Tiles.ToHashSet());
+        OnPlayerPointsChanged(_playersNames[playerId], points);
     }
 
     public void GameOver(int playerId)
     {
-        var playerName = _currentPlayer.Id == playerId ? "You" : PlayerName(playerId);
+        var playerName = _playerId == playerId ? "You" : _playersNames[playerId];
         _snackBar.Add($"Game is over. {playerName} win");
     }
 
     public void PlayerIdTurn(int playerId)
     {
-        var message = _currentPlayer.Id == playerId ? "It's your turn" : $"It's {PlayerName(playerId)}'s turn";
+        var message = _playerId == playerId ? "It's your turn" : $"It's {_playersNames[playerId]}'s turn";
         _snackBar.Add(message);
+        OnPlayerTurnChanged(_playersNames[playerId]);
     }
 
     public void TurnSkipped(int playerId)
     {
-        if (_currentPlayer.Id != playerId) _snackBar.Add($"{PlayerName(playerId)} has skipped his turn");
+        if (_playerId != playerId) _snackBar.Add($"{_playersNames[playerId]} has skipped his turn");
     }
 
     public void TilesSwapped(int playerId)
     {
-        if (_currentPlayer.Id != playerId) _snackBar.Add($"{PlayerName(playerId)} has swapped tiles");
+        if (_playerId != playerId) _snackBar.Add($"{_playersNames[playerId]} has swapped tiles");
     }
 
     public void PlayersInGame(HashSet<int> playersIds)
     {
-        playersIds.Remove(_currentPlayer.Id);
+        playersIds.Remove(_playerId);
         if (playersIds.Count == 1)
         {
-            _snackBar.Add($"{PlayerName(playersIds.First())} is online");
+            _snackBar.Add($"{_playersNames[playersIds.First()]} is online");
             return;
         }
 
         var stringBuilder = new StringBuilder();
         foreach (var playerId in playersIds)
         {
-            stringBuilder.Append(PlayerName(playerId));
+            stringBuilder.Append(_playersNames[playerId]);
             stringBuilder.Append(" - ");
         }
         stringBuilder.Remove(stringBuilder.Length - 3, 2);
         stringBuilder.Append("are online");
         _snackBar.Add(stringBuilder.ToString());
     }
+    private void OnTilesOnBoardAdded(IEnumerable<TileOnBoard> tilesOnBoard) => TilesOnBoardPlayed.Invoke(this, new TilesOnBoardPlayedEventArgs(tilesOnBoard));
+    private void OnPlayerTurnChanged(string playerName) => PlayerTurnChanged.Invoke(this, new PlayerTurnChangedEventArgs(playerName));
+    private void OnPlayerPointsChanged(string playerName, int points) => PlayerPointsChanged.Invoke(this, new PlayerPointsChangedEventArgs(playerName, points));
 }

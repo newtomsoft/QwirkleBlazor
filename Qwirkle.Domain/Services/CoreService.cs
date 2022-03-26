@@ -50,7 +50,7 @@ public class CoreService
 
     public Game ResetGame(int gameId) => _repository.GetGame(gameId);
 
-    public ArrangeRackReturn TryArrangeRack(int playerId, IEnumerable<Tile> tiles)
+    public ArrangeRackReturn TryArrangeRack(int playerId, IEnumerable<TileOnRack> tiles)
     {
         var tilesList = tiles.ToList();
         var player = _infoService.GetPlayer(playerId);
@@ -83,8 +83,8 @@ public class CoreService
     {
         var tilesList = tiles.ToList();
         var player = _infoService.GetPlayer(playerId);
-        if (!player.IsTurn) return new SwapTilesReturn { GameId = player.GameId, Code = ReturnCode.NotPlayerTurn };
-        if (!player.HasTiles(tilesList)) return new SwapTilesReturn { GameId = player.GameId, Code = ReturnCode.PlayerDoesntHaveThisTile };
+        if (!player.IsTurn) return new SwapTilesReturn(player.GameId, ReturnCode.NotPlayerTurn, Rack.Empty);
+        if (!player.HasTiles(tilesList)) return new SwapTilesReturn(player.GameId, ReturnCode.PlayerDoesntHaveThisTile, Rack.Empty);
         var game = _repository.GetGame(player.GameId);
         var swapTilesReturn = SwapTiles(game, player, tilesList);
         _notification.SendTilesSwapped(game.Id, playerId);
@@ -114,7 +114,7 @@ public class CoreService
 
     public PlayReturn Play(HashSet<TileOnBoard> tilesPlayed, Player player, Game game, bool simulationMode = false)
     {
-        var orderedTilesPlayed = tilesPlayed.OrderBy(t => t.Coordinates).ToList();
+        var orderedTilesPlayed = tilesPlayed.OrderBy(t => t.Coordinate).ToList();
         if (IsCoordinatesNotFree()) return new PlayReturn(game.Id, ReturnCode.NotFree, Move.Empty, Rack.Empty);
         if (!game.IsBoardEmpty() && IsAnyTileIsolated()) return new PlayReturn(game.Id, ReturnCode.TileIsolated, Move.Empty, Rack.Empty);
 
@@ -135,15 +135,16 @@ public class CoreService
         bool IsFirstMoveNotCompliant() => wonPoints != _botService.GetMostPointsToPlay(player, game);
     }
 
-    private void GameOver(Game game) => _repository.SetGameOver(game.Id);
+    private void GameOver(Game game)
+    {
+        _repository.SetGameOver(game.Id);
+    }
 
     private Game InitializeEmptyGame() => _repository.CreateGame(DateTime.UtcNow);
 
     private void DealTilesToPlayers(Game game)
     {
-        var rackPositions = new List<byte>();
-        for (byte i = 0; i < TilesNumberPerPlayer; i++) rackPositions.Add(i);
-        foreach (var player in game.Players) _repository.TilesFromBagToPlayer(player, rackPositions);
+        foreach (var player in game.Players) _repository.TilesFromBagToPlayer(player);
     }
 
     private void PutTilesOnBag(Game game) => _repository.PutTilesOnBag(game.Id);
@@ -153,7 +154,7 @@ public class CoreService
         foreach (var userId in usersIds) game.Players.Add(_repository.CreatePlayer(userId, game.Id));
     }
 
-    private void ArrangeRack(Player player, IEnumerable<Tile> tiles) => _repository.ArrangeRack(player, tiles);
+    private void ArrangeRack(Player player, IEnumerable<TileOnRack> tiles) => _repository.ArrangeRack(player, tiles);
 
     private Game SortPlayers(Game game)
     {
@@ -191,15 +192,13 @@ public class CoreService
 
     private SwapTilesReturn SwapTiles(Game game, Player player, IEnumerable<Tile> tiles)
     {
-        var tilesList = tiles.ToList();
+        var tilesToSwap = tiles.ToArray();
         ResetGame(player.GameId);
         SetNextPlayerTurnToPlay(game, player);
-        var positionsInRack = new List<byte>();
-        for (byte i = 0; i < tilesList.Count; i++) positionsInRack.Add(i);
-        _repository.TilesFromBagToPlayer(player, positionsInRack);
-        _repository.TilesFromPlayerToBag(player, tilesList);
+        _repository.TilesFromBagToPlayer(player, tilesToSwap);
+        _repository.TilesFromPlayerToBag(player, tilesToSwap);
         _repository.UpdatePlayer(player);
-        return new SwapTilesReturn { GameId = player.GameId, Code = ReturnCode.Ok, NewRack = _infoService.GetPlayer(player.Id).Rack };
+        return new SwapTilesReturn(player.GameId, ReturnCode.Ok, _infoService.GetPlayer(player.Id).Rack);
     }
 
     private Rack PlayTiles(Game game, Player player, IEnumerable<TileOnBoard> tilesToPlay, int points)
@@ -211,16 +210,24 @@ public class CoreService
         _logger.LogInformation("player {playerId} play {tiles} and get {pointsNumber} points", player.Id, tilesToPlayList.ToLog(), points);
         game.Board.AddTiles(tilesToPlayList);
         SetNextPlayerTurnToPlay(game, player);
-        var positionsInRack = new List<byte>();
-        for (byte i = 0; i < tilesToPlayList.Count; i++) positionsInRack.Add(i);
-        _repository.TilesFromBagToPlayer(player, positionsInRack);
+
+        var tilesToSwap = tilesToPlayList.Select(t => t.ToTile());
+        _repository.TilesFromBagToPlayer(player, tilesToSwap);
         _repository.TilesFromPlayerToBoard(game.Id, player.Id, tilesToPlayList);
         return _repository.GetPlayer(player.Id).Rack;
     }
 
     private void SetNextPlayerTurnToPlay(Game game, Player player)
     {
-        if (game.GameOver) return;
+        if (game.GameOver)
+        {
+            game.Players.ForEach(p =>
+            {
+                p.SetTurn(false);
+                _repository.UpdatePlayer(p);
+            });
+            return;
+        }
 
         if (game.Players.Count == 1)
         {

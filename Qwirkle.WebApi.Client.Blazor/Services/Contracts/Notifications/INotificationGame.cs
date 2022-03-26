@@ -2,7 +2,6 @@
 
 public interface INotificationGame : IAsyncDisposable
 {
-    //public void Initialize(Uri hubUri);
     Task Start();
     Task Stop();
 

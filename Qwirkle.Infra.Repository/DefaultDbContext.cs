@@ -1,13 +1,11 @@
-﻿using Qwirkle.Domain.Services;
-
-namespace Qwirkle.Infra.Repository;
+﻿namespace Qwirkle.Infra.Repository;
 
 public class DefaultDbContext : IdentityDbContext<UserDao, IdentityRole<int>, int>
 {
     public DbSet<TileDao> Tiles { get; set; }
     public DbSet<TileOnBagDao> TilesOnBag { get; set; }
     public DbSet<TileOnBoardDao> TilesOnBoard { get; set; }
-    public DbSet<TileOnPlayerDao> TilesOnPlayer { get; set; }
+    public DbSet<TileOnRackDao> TilesOnRack { get; set; }
     public DbSet<GameDao> Games { get; set; }
     public DbSet<PlayerDao> Players { get; set; }
     public override DbSet<UserDao> Users { get; set; }

@@ -2,5 +2,5 @@
 
 public class TileOutBoardDroppedEventArgs : EventArgs
 {
-    public Coordinates Coordinates { get; set; }
+    public Coordinate Coordinate { get; set; }
 }

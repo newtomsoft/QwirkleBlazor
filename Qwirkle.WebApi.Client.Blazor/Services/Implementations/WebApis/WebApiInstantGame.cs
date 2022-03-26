@@ -8,7 +8,7 @@ public class WebApiInstantGame : WebApiBase, IApiInstantGame
 
     public async Task<InstantGameModel> JoinInstantGame(int playersNumber)
     {
-        var response = await _httpClient.GetAsync($"api/{ControllerName}/Join/{playersNumber}");
+        var response = await _httpClient.GetAsync($"{ApiPrefix}/{ControllerName}/Join/{playersNumber}");
         if (response.StatusCode == HttpStatusCode.BadRequest) throw new Exception(await response.Content.ReadAsStringAsync());
         response.EnsureSuccessStatusCode();
 
