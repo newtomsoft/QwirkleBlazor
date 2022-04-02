@@ -9,7 +9,7 @@ public class LoginPageTests
         context.AddGenericServices();
         context.Services.AddQwirkleMudServices();
         var loginComponent = context.RenderComponent<LoginPage>();
-        
+
         loginComponent.Find("#btnSignIn").Click();
         loginComponent.Find("#validationUserName").Text().ShouldNotBe("");
         loginComponent.Find("#validationPassword").Text().ShouldNotBe("");
@@ -24,7 +24,7 @@ public class LoginPageTests
         context.Services.AddQwirkleMudServices();
         var loginComponent = context.RenderComponent<LoginPage>();
         var navigationManager = context.Services.GetRequiredService<FakeNavigationManager>();
-        
+
         loginComponent.Find("#inputUsername").Change("userTest");
         loginComponent.Find("#inputPassword").Change("passwordTest");
         loginComponent.Find("#btnSignIn").Click();
@@ -41,7 +41,7 @@ public class LoginPageTests
         context.Services.AddQwirkleMudServices();
         var loginComponent = context.RenderComponent<LoginPage>();
         var navigationManager = context.Services.GetRequiredService<FakeNavigationManager>();
-        
+
         loginComponent.Find("#btnLoginAsGuest").Click();
         var newUri = new Uri(navigationManager.Uri);
         newUri.LocalPath.ShouldBe(PageName.InstantGame);

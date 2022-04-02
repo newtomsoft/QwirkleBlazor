@@ -2,6 +2,21 @@
 
 public class GamePageTests
 {
+    [Fact(DisplayName = "Game Over test")]
+    public void GameOverTest()
+    {
+        const int gameId = 1;
+
+        using var context = new TestContext();
+        context.AddGenericServices();
+        context.AddGameApi(gameId, true);
+        context.AddPlayerApi(gameId);
+        context.Services.AddQwirkleMudServices();
+
+        context.RenderComponent<GamePage>(parameters => parameters.Add(p => p.GameId, gameId));
+        context.SnackBarMessageShouldBe("Game is over");
+    }
+
     [Theory(DisplayName = "Skip turn test")]
     [InlineData(ReturnCode.Ok, false)]
     [InlineData(ReturnCode.NotPlayerTurn, true)]
@@ -12,7 +27,7 @@ public class GamePageTests
         using var context = new TestContext();
         context.AddGenericServices();
         context.AddGameApi(gameId);
-        context.AddSkipTurnApi(new SkipTurnReturn { GameId = gameId, Code = skipTurnReturnCode });
+        context.AddSkipTurnApi(new SkipTurnReturn(gameId, skipTurnReturnCode));
         context.AddPlayerApi(gameId);
         context.Services.AddQwirkleMudServices();
 
@@ -20,7 +35,7 @@ public class GamePageTests
         gameComponent.Find("#actionResult").Text().ShouldBe(string.Empty);
         gameComponent.Find("#btnSkipTurn").Click();
         gameComponent.Find("#actionResult").Text().ShouldBe(skipTurnReturnCode.ToString());
-        if (isStackBarMessage) context.Services.GetService<ISnackbar>()!.ShownSnackbars.ToArray()[0].Message.ShouldBe(skipTurnReturnCode.ToDisplay());
+        if (isStackBarMessage) context.SnackBarMessageShouldBe(skipTurnReturnCode.ToDisplay());
     }
 
 
@@ -47,7 +62,7 @@ public class GamePageTests
         gameComponent.Find("#actionResult").Text().ShouldBe(string.Empty);
         gameComponent.Find("#btnPlayTiles").Click();
         gameComponent.Find("#actionResult").Text().ShouldBe(playTileReturnCode.ToString());
-        if (isStackBarMessage) context.Services.GetService<ISnackbar>()!.ShownSnackbars.ToArray()[0].Message.ShouldBe(playTileReturnCode.ToDisplay());
+        if (isStackBarMessage) context.SnackBarMessageShouldBe(playTileReturnCode.ToDisplay());
     }
 
     [Fact(DisplayName = "Play tiles test When no tile dropped on board")]
@@ -67,9 +82,8 @@ public class GamePageTests
         gameComponent.Find("#actionResult").Text().ShouldBe(string.Empty);
         gameComponent.Find("#btnPlayTiles").Click();
         gameComponent.Find("#actionResult").Text().ShouldBe(errorMessageExpected);
-        context.Services.GetService<ISnackbar>()!.ShownSnackbars.ToArray()[0].Message.ShouldBe(errorMessageExpected);
+        context.SnackBarMessageShouldBe(errorMessageExpected);
     }
-
 
     [Theory(DisplayName = "Swap tiles test")]
     [InlineData(ReturnCode.Ok, false)]
@@ -90,7 +104,7 @@ public class GamePageTests
         gameComponent.Find("#actionResult").Text().ShouldBe(string.Empty);
         gameComponent.Find("#btnSwapTiles").Click();
         gameComponent.Find("#actionResult").Text().ShouldBe(swapTileReturnCode.ToString());
-        if (isStackBarMessage) context.Services.GetService<ISnackbar>()!.ShownSnackbars.ToArray()[0].Message.ShouldBe(swapTileReturnCode.ToDisplay());
+        if (isStackBarMessage) context.SnackBarMessageShouldBe(swapTileReturnCode.ToDisplay());
     }
 
     [Fact(DisplayName = "Swap tiles test When no tile dropped on bag")]
@@ -110,6 +124,6 @@ public class GamePageTests
         gameComponent.Find("#actionResult").Text().ShouldBe(string.Empty);
         gameComponent.Find("#btnSwapTiles").Click();
         gameComponent.Find("#actionResult").Text().ShouldBe(errorMessageExpected);
-        context.Services.GetService<ISnackbar>()!.ShownSnackbars.ToArray()[0].Message.ShouldBe(errorMessageExpected);
+        context.SnackBarMessageShouldBe(errorMessageExpected);
     }
 }

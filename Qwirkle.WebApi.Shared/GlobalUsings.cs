@@ -1,5 +1,4 @@
 ﻿global using Qwirkle.Domain.Entities;
-global using Qwirkle.Domain.Enums;
 global using Qwirkle.Domain.Services;
 global using Qwirkle.Domain.ValueObjects;
 global using System;

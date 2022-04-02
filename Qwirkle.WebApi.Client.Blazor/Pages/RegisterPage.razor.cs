@@ -2,8 +2,8 @@
 
 public partial class RegisterPage : ComponentBase
 {
-    [Inject] private NavigationManager? NavigationManager { get; set; }
-    [Inject] private IdentityAuthenticationStateProvider? AuthStateProvider { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private IdentityAuthenticationStateProvider AuthStateProvider { get; set; } = default!;
 
     private RegisterModel RegisterModel { get; } = new() { SignInPersistent = true };
     private string Error { get; set; } = string.Empty;
@@ -19,11 +19,5 @@ public partial class RegisterPage : ComponentBase
         {
             Error = ex.Message;
         }
-    }
-
-    private async Task LoginAsGuest()
-    {
-        await AuthStateProvider!.RegisterGuest();
-        NavigationManager!.NavigateTo(PageName.InstantGame);
     }
 }

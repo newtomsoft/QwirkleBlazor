@@ -161,6 +161,23 @@ public class PlayTilesShould
     }
 
     [Fact]
+    public void SimulationReturn12After1PlayerHavePlayedHisFullRackForFirstMove()
+    {
+        InitTest();
+        var tilesToPlay = new List<TileOnBoard>
+        { new(TileColor.Green, TileShape.Circle, Coordinate.From(-4, 4)),
+            new(TileColor.Green, TileShape.Square, Coordinate.From(-4, 3)),
+            new(TileColor.Green, TileShape.Diamond, Coordinate.From(-4, 2)),
+            new(TileColor.Green, TileShape.FourPointStar, Coordinate.From(-4, 1)),
+            new(TileColor.Green, TileShape.EightPointStar, Coordinate.From(-4, 0)),
+            new(TileColor.Green, TileShape.Clover, Coordinate.From(-4, -1))
+        };
+        var playReturn = _coreService.TryPlayTilesSimulation(Player9, tilesToPlay);
+        playReturn.Code.ShouldBe(ReturnCode.Ok);
+        playReturn.Move.Points.ShouldBe(6 + 6);
+    }
+
+    [Fact]
     public void ReturnNotMostPointsMoveAfterFirstPlayerHavePlayedNotMostPointsForFirstMove()
     {
         InitTest();
@@ -210,6 +227,22 @@ public class PlayTilesShould
     }
 
     [Fact]
+    public void SimulationReturnNotFreeWhenCoordinateOnBoardIsNotFree()
+    {
+        InitTest();
+        InitBoard();
+
+        var tilesToPlay = new List<TileOnBoard> { new(TileColor.Green, TileShape.Circle, Coordinate.From(5, 7)) };
+        _coreService.TryPlayTilesSimulation(Player9, tilesToPlay).Code.ShouldBe(ReturnCode.NotFree);
+
+        void InitBoard()
+        {
+            _dbContext.TilesOnBoard.Add(new TileOnBoardDao { GameId = GameId, TileId = 69, PositionX = 5, PositionY = 7 });
+            _dbContext.SaveChanges();
+        }
+    }
+
+    [Fact]
     public void PersistGoodAfter2PlayersMoves()
     {
         InitTest();
@@ -235,9 +268,9 @@ public class PlayTilesShould
         _ = PlayTilesAndTestPersistence(Player3, tilesToPlay, tilesPlayedOrdered);
     }
 
-    private static List<TileOnBoardDao> TileOnBoardDaoOrdered(DefaultDbContext _dbContext) => _dbContext.TilesOnBoard.Where(t => t.GameId == GameId).OrderBy(t => t.PositionX).ThenBy(t => t.PositionY).ToList();
+    private static List<TileOnBoardDao> TileOnBoardDaoOrdered(DefaultDbContext dbContext) => dbContext.TilesOnBoard.Where(t => t.GameId == GameId).OrderBy(t => t.PositionX).ThenBy(t => t.PositionY).ToList();
 
-    private List<TileOnBoard> Order(List<TileOnBoard> tilesToPlay) => tilesToPlay.OrderBy(t => t.Coordinate.X).ThenBy(t => t.Coordinate.Y).ToList();
+    private static List<TileOnBoard> Order(IEnumerable<TileOnBoard> tilesToPlay) => tilesToPlay.OrderBy(t => t.Coordinate.X).ThenBy(t => t.Coordinate.Y).ToList();
 
     private static void TestEqualityBetweenTilesPlayedAndPersistenceBoard(IReadOnlyCollection<TileOnBoardDao> tilesOnBoard, IReadOnlyCollection<TileOnBoard> tilesPlayed)
     {
@@ -247,7 +280,7 @@ public class PlayTilesShould
         tilesOnBoard.Select(t => t.Tile.Color).ShouldBe(tilesPlayed.Select(t => t.Color));
     }
 
-    private List<TileOnBoard> PlayTilesAndTestPersistence(int playerId, List<TileOnBoard> tilesToPlay, List<TileOnBoard> tilesPlayedOrdered)
+    private List<TileOnBoard> PlayTilesAndTestPersistence(int playerId, IReadOnlyCollection<TileOnBoard> tilesToPlay, List<TileOnBoard> tilesPlayedOrdered)
     {
         var playReturn = _coreService.TryPlayTiles(playerId, tilesToPlay);
         playReturn.Code.ShouldBe(ReturnCode.Ok);

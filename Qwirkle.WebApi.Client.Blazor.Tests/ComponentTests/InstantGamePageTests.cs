@@ -16,6 +16,7 @@ public class InstantGamePageTests
         new(false, 4, new(true, new[] { "player1", "player2" })),
         new(false, 4, new(true, new[] { "player1", })),
 
+        new(false, 4, new(false, Array.Empty<string>())),
     };
 
     [Theory(DisplayName = "InstantGame Test")]
@@ -42,7 +43,12 @@ public class InstantGamePageTests
             var waitingPlayerElements = instantGamePage.FindAll(".waitingPlayer").ToList();
             waitingPlayerElements.Count.ShouldBe(input.InstantGameModel.UsersNames.Length);
             for (var i = 0; i < input.InstantGameModel.UsersNames.Length; i++)
+            {
                 waitingPlayerElements[i].TextContent.ShouldBe(input.InstantGameModel.UsersNames[i]);
+                context.SnackBarMessageShouldContain(input.InstantGameModel.UsersNames[i]);
+                context.SnackBarMessageShouldContain($"Waiting for {input.PlayersNumberNeedToStartGame - input.InstantGameModel.UsersNames.Length} player(s)", 1);
+            }
         }
+        if (input.InstantGameModel.IsAdded is false) context.SnackBarMessageShouldBe("You're already waiting for the game");
     }
 }

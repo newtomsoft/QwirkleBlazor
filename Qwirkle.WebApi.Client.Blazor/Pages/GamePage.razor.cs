@@ -11,7 +11,7 @@ public partial class GamePage : IAsyncDisposable
     [Inject] private INotificationReceiver NotificationReceiver { get; set; } = default!;
     [Inject] private IAreaManager AreaManager { get; set; } = default!;
     [Inject] private IDragNDropManager DragNDropManager { get; set; } = default!;
-    [Inject] private IPlayersInfo PlayersInfo { get; set; } = default!;
+    [Inject] private IPlayersDetail PlayersDetail { get; set; } = default!;
 
     private string _actionResult = string.Empty;
     private Game _game = default!;
@@ -32,15 +32,15 @@ public partial class GamePage : IAsyncDisposable
         if (GameId <= 0) return;
 
         _game = await ApiGame.GetGame(GameId);
-        if (_game.GameOver) SnackBar.Add("Game is over");
         _player = await ApiPlayer.GetByGameId(GameId);
-        PlayersInfo.Initialize(_game.Players.Select(p => new PlayerInfo(p)), _player.Pseudo);
+        if (_game.GameOver) SnackBar.Add("Game is over");
+        PlayersDetail.Initialize(_game.Players.Select(p => new PlayerDetail(p)), _player.Pseudo);
         DragNDropManager.Initialize();
         await InitializeNotifications();
         TilesOnBoardPlayed += DragNDropManager.OnTilesOnBoardPlayed!;
         TilesOnBoardPlayed += (source, eventArgs) => AreaManager.OnTilesOnBoardPlayed(source!, eventArgs);
         TilesOnRackChanged += DragNDropManager.OnTilesOnRackChanged!;
-        PlayerPointsChanged += PlayersInfo.OnPlayerPointsChanged!;
+        PlayerPointsChanged += PlayersDetail.OnPlayerPointsChanged!;
         OnTilesOnBoardPlayed(_game.Board.Tiles);
         OnTilesOnRackChanged(_player.Rack.Tiles);
 

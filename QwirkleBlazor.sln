@@ -51,6 +51,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration Tests", "Integr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Qwirkle.Tests.Integration", "Qwirkle.Tests.Integration\Qwirkle.Tests.Integration.csproj", "{B1721F56-0D62-4A80-BA21-DA1AB8BF0781}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Qwirkle.Coverage.Test", "Qwirkle.Coverage.Test\Qwirkle.Coverage.Test.csproj", "{76A63361-DE7B-474B-B0BF-BC24D6442F73}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -205,6 +207,18 @@ Global
 		{B1721F56-0D62-4A80-BA21-DA1AB8BF0781}.Release|x64.Build.0 = Release|Any CPU
 		{B1721F56-0D62-4A80-BA21-DA1AB8BF0781}.Release|x86.ActiveCfg = Release|Any CPU
 		{B1721F56-0D62-4A80-BA21-DA1AB8BF0781}.Release|x86.Build.0 = Release|Any CPU
+		{76A63361-DE7B-474B-B0BF-BC24D6442F73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76A63361-DE7B-474B-B0BF-BC24D6442F73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76A63361-DE7B-474B-B0BF-BC24D6442F73}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{76A63361-DE7B-474B-B0BF-BC24D6442F73}.Debug|x64.Build.0 = Debug|Any CPU
+		{76A63361-DE7B-474B-B0BF-BC24D6442F73}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{76A63361-DE7B-474B-B0BF-BC24D6442F73}.Debug|x86.Build.0 = Debug|Any CPU
+		{76A63361-DE7B-474B-B0BF-BC24D6442F73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76A63361-DE7B-474B-B0BF-BC24D6442F73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76A63361-DE7B-474B-B0BF-BC24D6442F73}.Release|x64.ActiveCfg = Release|Any CPU
+		{76A63361-DE7B-474B-B0BF-BC24D6442F73}.Release|x64.Build.0 = Release|Any CPU
+		{76A63361-DE7B-474B-B0BF-BC24D6442F73}.Release|x86.ActiveCfg = Release|Any CPU
+		{76A63361-DE7B-474B-B0BF-BC24D6442F73}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -224,6 +238,7 @@ Global
 		{1B5DA17F-6E0A-4507-94A3-8DEEB907AF06} = {00A3FE06-55C0-4EB1-B9B5-8E25052F810A}
 		{01289102-AB51-476D-970F-9DC9393A70C7} = {00A3FE06-55C0-4EB1-B9B5-8E25052F810A}
 		{B1721F56-0D62-4A80-BA21-DA1AB8BF0781} = {01289102-AB51-476D-970F-9DC9393A70C7}
+		{76A63361-DE7B-474B-B0BF-BC24D6442F73} = {1B5DA17F-6E0A-4507-94A3-8DEEB907AF06}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BE05E851-2071-4403-B9AE-415E988E0CBB}

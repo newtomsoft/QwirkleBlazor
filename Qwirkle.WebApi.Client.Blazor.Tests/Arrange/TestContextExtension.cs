@@ -9,8 +9,11 @@ public static class TestContextExtension
         context.Services.AddMockedService(new Mock<INotificationGame>());
         context.Services.AddMockedService(new Mock<INotificationInstantGame>());
         context.Services.AddMockedService(new Mock<INotificationReceiver>());
-        context.Services.AddMockedService(new Mock<IPlayersInfo>());
         context.Services.AddMockedService(new Mock<IApiAction>());
+
+        var playersDetail = new Mock<IPlayersDetail>();
+        playersDetail.Setup(x => x.All).Returns(new PlayerDetail[] { new(Player1), new(Player2) });
+        context.Services.AddMockedService(playersDetail);
 
         var areaManager = new Mock<IAreaManager>();
         areaManager.Setup(x => x.BoardLimit).Returns(new BoardLimit(new List<Coordinate> { Coordinate.From(0, 0) }));
@@ -20,6 +23,8 @@ public static class TestContextExtension
         dragNDropManager.Setup(x => x.AllPlayerTiles).Returns(new HashSet<DropItem>());
         dragNDropManager.Setup(x => x.TilesDroppedOnBoard).Returns(new HashSet<DropItem> { new() { Coordinate = Coordinate.From(0, 0), RackPosition = 0, DropZone = DropZone.Board, Tile = new Tile(TileColor.Blue, TileShape.Clover) } });
         dragNDropManager.Setup(x => x.TilesDroppedOnBag).Returns(new HashSet<DropItem> { new() { RackPosition = 0, DropZone = DropZone.Bag, Tile = new Tile(TileColor.Blue, TileShape.Clover) } });
+        dragNDropManager.Setup(x => x.AllPlayerTiles).Returns(new HashSet<DropItem> { new() { RackPosition = 0, DropZone = DropZone.Bag, Tile = new Tile(TileColor.Blue, TileShape.Clover) } });
+        dragNDropManager.Setup(x => x.AllTilesInGame).Returns(new HashSet<DropItem> { new() { RackPosition = 0, DropZone = DropZone.Bag, Tile = new Tile(TileColor.Blue, TileShape.Clover) } });
         context.Services.AddMockedService(dragNDropManager);
         context.JSInterop.SetupVoid("mudDragAndDrop.initDropZone", _ => true);
 
@@ -46,10 +51,13 @@ public static class TestContextExtension
         context.Services.AddMockedService(instantGameApi);
     }
 
-    public static void AddGameApi(this TestContextBase context, int gameId)
+    public static void AddGameApi(this TestContextBase context, int gameId, bool gameOver = false)
     {
         var gameApi = new Mock<IApiGame>();
-        gameApi.Setup(x => x.GetGame(gameId)).Returns(Task.FromResult(new Game(gameId, Board.Empty, new List<Player>(), false)));
+        var player1 = new Player(1, 1, gameId, "player0", 0, 0, 0, Rack.Empty, true, false);
+        var player2 = new Player(2, 2, gameId, "player1", 0, 0, 0, Rack.Empty, false, false);
+        var players = new List<Player>() { player1, player2 };
+        gameApi.Setup(x => x.GetGame(gameId)).Returns(Task.FromResult(new Game(gameId, Board.Empty, players, gameOver)));
         context.Services.AddMockedService(gameApi);
     }
 
@@ -87,4 +95,10 @@ public static class TestContextExtension
     }
 
     private static void AddMockedService<T>(this IServiceCollection services, IMock<T> mockedService) where T : class => services.AddSingleton(mockedService.Object);
+
+
+    private static readonly Player Player1 = new(1, 1, 1, "player1", 0, 0, 0, Rack.Empty, true, false);
+    private static readonly Player Player2 = new(2, 2, 1, "player2", 0, 0, 0, Rack.Empty, false, false);
+    private static readonly Player Player3 = new(3, 3, 1, "player3", 0, 0, 0, Rack.Empty, false, false);
+    private static readonly Player Player4 = new(4, 4, 1, "player4", 0, 0, 0, Rack.Empty, false, false);
 }

@@ -9,13 +9,13 @@ public class NotificationReceiver : INotificationReceiver
     private int _playerId;
     private Dictionary<int, string> _playersNames = default!;
 
-    public NotificationReceiver(ISnackbar snackBar, IDragNDropManager dragNDropManager, IAreaManager areaManager, IPlayersInfo playersInfo)
+    public NotificationReceiver(ISnackbar snackBar, IDragNDropManager dragNDropManager, IAreaManager areaManager, IPlayersDetail playersDetail)
     {
         _snackBar = snackBar;
         TilesOnBoardPlayed += dragNDropManager.OnTilesOnBoardPlayed!;
         TilesOnBoardPlayed += (source, eventArgs) => areaManager.OnTilesOnBoardPlayed(source!, eventArgs);
-        PlayerTurnChanged += playersInfo.OnPlayerTurnChanged!;
-        PlayerPointsChanged += playersInfo.OnPlayerPointsChanged!;
+        PlayerTurnChanged += playersDetail.OnPlayerTurnChanged!;
+        PlayerPointsChanged += playersDetail.OnPlayerPointsChanged!;
     }
 
     public void Initialize(Dictionary<int, string> idPlayerNameDictionary, int playerId, Action stateHaveChange)

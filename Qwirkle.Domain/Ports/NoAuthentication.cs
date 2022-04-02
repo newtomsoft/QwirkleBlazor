@@ -1,6 +1,6 @@
-﻿namespace Qwirkle.UltraBoardGames.Player;
+﻿namespace Qwirkle.Domain.Ports;
 
-internal class NoAuthentication : IAuthentication
+public class NoAuthentication : IAuthentication
 {
     public Task<bool> RegisterAsync(User user, string password, bool isSignInPersistent) => throw new NotSupportedException();
     public Task<bool> RegisterGuestAsync() => throw new NotSupportedException();

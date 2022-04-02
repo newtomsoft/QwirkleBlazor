@@ -4,9 +4,9 @@
 @if (_isInitialized)
 {
     <div class="d-flex">
-        @foreach (var playerInfo in PlayersInfo.Get)
+        @foreach (var playerDetail in PlayersDetail.All)
         {
-            <PlayerComponent PlayerInfo="playerInfo" />
+            <PlayerDetailComponent PlayerDetail="playerDetail" />
         }
     </div>
 
@@ -31,4 +31,4 @@
 <MudButton id="btnSkipTurn" Variant="Variant.Filled" Color="Color.Primary" OnClick="SkipTurn">Skip turn</MudButton>
 <MudButton id="btnArrangeRack" Variant="Variant.Filled" Color="Color.Primary" OnClick="ArrangeRack">ArrangeRack</MudButton>
 
-<div id="actionResult" hidden="true">@_actionResult</div>
+<div id="actionResult" hidden>@_actionResult</div>

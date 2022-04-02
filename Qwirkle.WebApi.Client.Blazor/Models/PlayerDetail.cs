@@ -1,13 +1,13 @@
 ﻿namespace Qwirkle.WebApi.Client.Blazor.Models;
 
-public class PlayerInfo
+public class PlayerDetail
 {
     public string Pseudo { get; }
     public int GamePosition { get; }
     public int Points { get; set; }
     public bool IsTurn { get; set; }
 
-    public PlayerInfo(Player player)
+    public PlayerDetail(Player player)
     {
         Pseudo = player.Pseudo;
         GamePosition = player.GamePosition;

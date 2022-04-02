@@ -22,7 +22,7 @@ public class RegisterPageTests
         context.Services.AddQwirkleMudServices();
         var registerPage = context.RenderComponent<RegisterPage>();
         var navigationManager = context.Services.GetRequiredService<FakeNavigationManager>();
-        
+
         registerPage.Find("#inputUsername").Change(input.RegisterModel.UserName);
         registerPage.Find("#inputEmail").Change(input.RegisterModel.Email);
         registerPage.Find("#inputPassword").Change(input.RegisterModel.Password);
@@ -37,5 +37,19 @@ public class RegisterPageTests
         {
             registerPage.Find(input.InputSelectorInError).Text().ShouldNotBe("");
         }
+    }
+
+    [Fact]
+    public void RegisterAsGuestShouldRedirectToInstantGame()
+    {
+        using var context = new TestContext();
+        context.AddGenericServices();
+        context.Services.AddQwirkleMudServices();
+        var loginComponent = context.RenderComponent<RegisterPage>();
+        var navigationManager = context.Services.GetRequiredService<FakeNavigationManager>();
+
+        loginComponent.Find("#btnLoginAsGuest").Click();
+        var newUri = new Uri(navigationManager.Uri);
+        newUri.LocalPath.ShouldBe(PageName.InstantGame);
     }
 }

@@ -131,15 +131,13 @@ public class JoinInstantGameShould
         const int userNumber = 234567;
         var usersIds = Enumerable.Range(1, userNumber).ToArray();
         var resultUsersIds = new HashSet<string>[userNumber + 1];
-        var badGamesNumber = 0;
         Parallel.ForEach(usersIds, id =>
         {
             var userName = "user" + id;
             resultUsersIds[id] = _instantGameService.JoinInstantGame(userName, playersNumberInGame).UsersNames;
-            if (resultUsersIds[id].Count > playersNumberInGame) badGamesNumber++;
+            (resultUsersIds[id].Count > playersNumberInGame).ShouldBeFalse();
         });
         resultUsersIds[0] = new HashSet<string>();
         resultUsersIds.Count(e => e.Count == playersNumberInGame).ShouldBe(userNumber / playersNumberInGame);
-        badGamesNumber.ShouldBe(0);
     }
 }

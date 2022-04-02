@@ -1,9 +1,9 @@
 ﻿<MudCard Outlined="true">
     <MudCardContent>
         <MudBadge Color="Color.Primary">
-            <MudAvatar Color="Color.Info" Variant="@(PlayerInfo.IsTurn ? Variant.Filled : Variant.Outlined)">@PlayerInfo.Pseudo[0]</MudAvatar>
+            <MudAvatar Color="Color.Info" Variant="@(PlayerDetail.IsTurn ? Variant.Filled : Variant.Outlined)">@PlayerDetail.Pseudo[0]</MudAvatar>
         </MudBadge>
-        @PlayerInfo.Points points
+        @PlayerDetail.Points points
     </MudCardContent>
     <MudCardActions>
         <MudButton Variant="Variant.Text" Color="Color.Primary">Chat</MudButton>

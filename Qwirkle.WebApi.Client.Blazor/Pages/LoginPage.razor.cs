@@ -2,8 +2,8 @@
 
 public partial class LoginPage
 {
-    [Inject] private NavigationManager NavigationManager { get; set; }
-    [Inject] private IdentityAuthenticationStateProvider AuthStateProvider { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private IdentityAuthenticationStateProvider AuthStateProvider { get; set; } = default!;
 
     private LoginModel LoginModel { get; } = new() { RememberMe = true };
     private string Error { get; set; } = string.Empty;
@@ -20,12 +20,6 @@ public partial class LoginPage
         {
             Error = ex.Message;
         }
-    }
-
-    private async Task LoginAsGuest()
-    {
-        await AuthStateProvider.RegisterGuest();
-        NavigationManager.NavigateTo(PageName.InstantGame);
     }
 }
 

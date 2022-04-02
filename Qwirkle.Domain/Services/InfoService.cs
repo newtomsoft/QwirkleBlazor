@@ -38,7 +38,7 @@ public class InfoService
         var isUserInGame = game.Players.Any(p => p.UserId == userId);
         if (!isUserInGame) return null;
         var otherPlayers = game.Players.Where(p => p.UserId != userId);
-        foreach (var player in otherPlayers) player.Rack = Rack.From(null);
+        foreach (var player in otherPlayers) player.Rack = player.Rack.ToHiddenRack();
         return game;
     }
 }

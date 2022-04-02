@@ -17,7 +17,7 @@ builder.Services.AddSingleton<INotificationGame, SignalRNotificationGame>();
 builder.Services.AddSingleton<IAreaManager, AreaManager>();
 builder.Services.AddSingleton<IDragNDropManager, DragNDropManager>();
 builder.Services.AddScoped<INotificationReceiver, NotificationReceiver>();
-builder.Services.AddScoped<IPlayersInfo, PlayersInfo>();
+builder.Services.AddScoped<IPlayersDetail, PlayersDetail>();
 
 var host = builder.Build();
 var jsRuntime = host.Services.GetRequiredService<IJSRuntime>();

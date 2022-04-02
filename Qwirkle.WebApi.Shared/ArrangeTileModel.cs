@@ -4,7 +4,7 @@
 public class ArrangeTileModel
 {
     public int GameId { get; init; }
-    public Tile Tile{ get; init; }
+    public Tile Tile { get; init; }
     public RackPosition RackPosition { get; init; }
 
 

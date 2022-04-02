@@ -1,5 +1,6 @@
 ﻿namespace Qwirkle.Domain.ValueObjects;
 
+[Serializable]
 public record TileOnBoard(Tile Tile, Coordinate Coordinate) : Tile(Tile)
 {
     public TileOnBoard(TileColor color, TileShape shape, Coordinate coordinate) : this(new Tile(color, shape), coordinate) { }

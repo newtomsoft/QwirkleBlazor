@@ -18,12 +18,12 @@ public class GetPlayPointsShould
     {
         var game = new Game(1, Board.From(new HashSet<TileOnBoard>()), new List<Player>(), _fakeBag, false);
         var tilesToPlay = new HashSet<TileOnBoard> { new(TileColor.Blue, TileShape.Circle, new Coordinate(0, 0)) };
-        var tilesOnPlayer = new List<TileOnRack> {new(0, TileColor.Blue, TileShape.Circle)};
+        var tilesOnPlayer = new List<TileOnRack> { new(0, TileColor.Blue, TileShape.Circle) };
         var rack = Rack.From(tilesOnPlayer);
         var player = new Player(0, 0, 0, "test", 1, 0, 0, rack, true, false);
         Service.Play(tilesToPlay, player, game).Move.Points.ShouldBe(1);
     }
-    
+
     [Fact]
     public void Return2WhenGameIsEmptyAndTilesMakeRowOf2Tiles()
     {
