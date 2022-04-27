@@ -1,7 +1,4 @@
-﻿using MudBlazor;
-using Qwirkle.WebApi.Client.Blazor.Services.Contracts.Notifications;
-
-namespace Qwirkle.WebApi.Client.Blazor.Tests.Arrange;
+﻿namespace Qwirkle.WebApi.Client.Blazor.Tests.Arrange;
 
 public static class ComponentFactory<T> where T : ComponentBase
 {

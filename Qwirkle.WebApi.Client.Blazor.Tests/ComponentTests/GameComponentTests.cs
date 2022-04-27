@@ -1,8 +1,4 @@
-﻿using Qwirkle.Domain.Entities;
-using Qwirkle.WebApi.Client.Blazor.Services.Contracts.Notifications;
-using NoNotificationGame = Qwirkle.WebApi.Client.Blazor.Tests.Arrange.NoNotificationGame;
-
-namespace Qwirkle.WebApi.Client.Blazor.Tests.ComponentTests;
+﻿namespace Qwirkle.WebApi.Client.Blazor.Tests.ComponentTests;
 
 public class GameComponentTests
 {
