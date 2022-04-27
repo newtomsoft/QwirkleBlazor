@@ -1,6 +1,4 @@
-﻿using Qwirkle.WebApi.Client.Blazor.Services.Contracts.Notifications;
-
-namespace Qwirkle.WebApi.Client.Blazor.Tests.Arrange;
+﻿namespace Qwirkle.WebApi.Client.Blazor.Tests.Arrange;
 
 public class NoNotificationGame : INotificationGame
 {
