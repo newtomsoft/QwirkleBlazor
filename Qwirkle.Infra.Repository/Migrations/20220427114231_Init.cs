@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -9,91 +10,113 @@ namespace Qwirkle.Infra.Repository.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterDatabase()
+                .Annotation("MySql:CharSet", "utf8mb4");
+
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    NormalizedName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ConcurrencyStamp = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetRoles", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "AspNetUsers",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Pseudo = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Pseudo = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    FirstName = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    LastName = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Help = table.Column<int>(type: "int", nullable: false),
                     Points = table.Column<int>(type: "int", nullable: false),
                     GamesPlayed = table.Column<int>(type: "int", nullable: false),
                     GamesWon = table.Column<int>(type: "int", nullable: false),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    NormalizedUserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Email = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    NormalizedEmail = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    EmailConfirmed = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    PasswordHash = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    SecurityStamp = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ConcurrencyStamp = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PhoneNumber = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     AccessFailedCount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Game",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastPlayDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    GameOver = table.Column<bool>(type: "bit", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    CreateDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    LastPlayDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    GameOver = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Game", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Tile",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Shape = table.Column<int>(type: "int", nullable: false),
                     Color = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tile", x => x.Id);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     RoleId = table.Column<int>(type: "int", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ClaimType = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ClaimValue = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -104,17 +127,20 @@ namespace Qwirkle.Infra.Repository.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ClaimType = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ClaimValue = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -125,15 +151,19 @@ namespace Qwirkle.Infra.Repository.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LoginProvider = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ProviderKey = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ProviderDisplayName = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -145,7 +175,8 @@ namespace Qwirkle.Infra.Repository.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserRoles",
@@ -169,16 +200,20 @@ namespace Qwirkle.Infra.Repository.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    LoginProvider = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Name = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Value = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -189,7 +224,8 @@ namespace Qwirkle.Infra.Repository.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "UserDaoUserDao",
@@ -211,22 +247,24 @@ namespace Qwirkle.Infra.Repository.Migrations
                         name: "FK_UserDaoUserDao_AspNetUsers_BookmarkedOpponentsId",
                         column: x => x.BookmarkedOpponentsId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                });
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "Player",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     GameId = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     Points = table.Column<int>(type: "int", nullable: false),
-                    LastTurnPoints = table.Column<byte>(type: "tinyint", nullable: false),
-                    GameTurn = table.Column<bool>(type: "bit", nullable: false),
-                    GamePosition = table.Column<byte>(type: "tinyint", nullable: false),
-                    LastTurnSkipped = table.Column<bool>(type: "bit", nullable: false)
+                    LastTurnPoints = table.Column<byte>(type: "tinyint unsigned", nullable: false),
+                    GameTurn = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    GamePosition = table.Column<byte>(type: "tinyint unsigned", nullable: false),
+                    LastTurnSkipped = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -243,14 +281,15 @@ namespace Qwirkle.Infra.Repository.Migrations
                         principalTable: "Game",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "TileOnBag",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     TileId = table.Column<int>(type: "int", nullable: false),
                     GameId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -269,18 +308,19 @@ namespace Qwirkle.Infra.Repository.Migrations
                         principalTable: "Tile",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "TileOnBoard",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     TileId = table.Column<int>(type: "int", nullable: false),
                     GameId = table.Column<int>(type: "int", nullable: false),
-                    PositionX = table.Column<short>(type: "smallint", nullable: false),
-                    PositionY = table.Column<short>(type: "smallint", nullable: false)
+                    PositionX = table.Column<sbyte>(type: "tinyint", nullable: false),
+                    PositionY = table.Column<sbyte>(type: "tinyint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -297,17 +337,18 @@ namespace Qwirkle.Infra.Repository.Migrations
                         principalTable: "Tile",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
                 name: "TileOnPlayer",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     TileId = table.Column<int>(type: "int", nullable: false),
                     PlayerId = table.Column<int>(type: "int", nullable: false),
-                    RackPosition = table.Column<byte>(type: "tinyint", nullable: false)
+                    RackPosition = table.Column<byte>(type: "tinyint unsigned", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -324,17 +365,18 @@ namespace Qwirkle.Infra.Repository.Migrations
                         principalTable: "Tile",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { 1, "5bdc0a4d-900b-4dfd-801c-afafc1132457", "Bot", "BOT" },
-                    { 2, "c3029150-bb16-4b67-8c99-f941f494ade1", "Admin", "ADMIN" },
-                    { 3, "9019946d-650e-4b41-9df8-b27610caacd6", "Guest", "GUEST" },
-                    { 4, "2a8c07b3-ea6b-42de-8cb3-02bd05638284", "User", "USER" }
+                    { 1, "59f67386-577a-438c-8d7d-1d76a0ae7548", "Bot", "BOT" },
+                    { 2, "c27b58f3-539f-4f87-9682-50ec2c3e90f7", "Admin", "ADMIN" },
+                    { 3, "c9551ff8-a8ff-44ac-98c3-12c9eabf5851", "Guest", "GUEST" },
+                    { 4, "ebc057eb-547c-4931-9f0f-233d4a81fa02", "User", "USER" }
                 });
 
             migrationBuilder.InsertData(
@@ -342,12 +384,12 @@ namespace Qwirkle.Infra.Repository.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "GamesPlayed", "GamesWon", "Help", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "Points", "SecurityStamp", "TwoFactorEnabled", "Pseudo" },
                 values: new object[,]
                 {
-                    { 1, 0, "917c8e70-ee8e-458d-8013-510628a40c66", "bot1@bot", false, null, 0, 0, 0, null, false, null, null, "BOT1", null, null, false, 0, null, false, "bot1" },
-                    { 2, 0, "0bd428e7-213b-4871-bc51-4070ba1a19ff", "bot2@bot", false, null, 0, 0, 0, null, false, null, null, "BOT2", null, null, false, 0, null, false, "bot2" },
-                    { 3, 0, "65665a48-93e7-467f-9b8c-207b4ea82e82", "bot3@bot", false, null, 0, 0, 0, null, false, null, null, "BOT3", null, null, false, 0, null, false, "bot3" },
-                    { 4, 0, "56c1dc8b-f87d-4334-a8b6-3ebb381de554", "bot4@bot", false, null, 0, 0, 0, null, false, null, null, "BOT4", null, null, false, 0, null, false, "bot4" },
-                    { 5, 0, "7e740ecb-0971-483d-86c9-c8dfc3ac4a1e", "thomas@newtomsoft.fr", false, "Thomas", 0, 0, 0, "Vuille", false, null, "THOMAS@NEWTOMSOFT.FR", "TOM", "AQAAAAEAACcQAAAAED29kKSVgjTdA6s6pXQ0a+7iy9MJ5Y1byxFl2MWZnX4WE6lw1SsR9FGeGypraM3G+g==", null, false, 0, "3250B471DF55411F984E2A529912AAA9", false, "Tom" },
-                    { 6, 0, "9890ecac-716e-4143-9954-109b6bc3b848", "jc@jc.fr", false, "Jean Charles", 0, 0, 0, "Gouleau", false, null, "JC@JC.FR", "JC", "AQAAAAEAACcQAAAAEJOr0iSf9bL59UJqwWyCpcjdampHsvulqOZ/NTApuuwLJsc1Sf9xRquQWPIz2S8rUQ==", null, false, 0, "66953B52AC7F4FDF88696C39FA475BBB", false, "JC" }
+                    { 1, 0, "c0866d5c-1f95-4eac-a4e8-f1fa6793e7ce", "bot1@bot", false, null, 0, 0, 0, null, false, null, null, "BOT1", null, null, false, 0, null, false, "bot1" },
+                    { 2, 0, "9e2e9404-c86a-4e87-91a2-3f1917a3201a", "bot2@bot", false, null, 0, 0, 0, null, false, null, null, "BOT2", null, null, false, 0, null, false, "bot2" },
+                    { 3, 0, "507d8d82-13a6-49f4-83ec-7d86aa9ce2ac", "bot3@bot", false, null, 0, 0, 0, null, false, null, null, "BOT3", null, null, false, 0, null, false, "bot3" },
+                    { 4, 0, "78937220-3f19-4079-9fb0-880d1a9ba5b9", "bot4@bot", false, null, 0, 0, 0, null, false, null, null, "BOT4", null, null, false, 0, null, false, "bot4" },
+                    { 5, 0, "38aa0e64-62e0-424d-98c1-f693cb637e47", "thomas@newtomsoft.fr", false, "Thomas", 0, 0, 0, "Vuille", false, null, "THOMAS@NEWTOMSOFT.FR", "TOM", "AQAAAAEAACcQAAAAED29kKSVgjTdA6s6pXQ0a+7iy9MJ5Y1byxFl2MWZnX4WE6lw1SsR9FGeGypraM3G+g==", null, false, 0, "1DCA68127F3E4B9C9D79891DF106DDE0", false, "Tom" },
+                    { 6, 0, "d401989c-4fcf-4c2a-8a88-bde513feb321", "jc@jc.fr", false, "Jean Charles", 0, 0, 0, "Gouleau", false, null, "JC@JC.FR", "JC", "AQAAAAEAACcQAAAAEJOr0iSf9bL59UJqwWyCpcjdampHsvulqOZ/NTApuuwLJsc1Sf9xRquQWPIz2S8rUQ==", null, false, 0, "D5FD8008831340B29E6AAA63540BC6E3", false, "JC" }
                 });
 
             migrationBuilder.InsertData(
@@ -386,14 +428,7 @@ namespace Qwirkle.Infra.Repository.Migrations
                     { 29, 5, 5 },
                     { 30, 5, 6 },
                     { 31, 6, 1 },
-                    { 32, 6, 2 }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Tile",
-                columns: new[] { "Id", "Color", "Shape" },
-                values: new object[,]
-                {
+                    { 32, 6, 2 },
                     { 33, 6, 3 },
                     { 34, 6, 4 },
                     { 35, 6, 5 },
@@ -435,14 +470,7 @@ namespace Qwirkle.Infra.Repository.Migrations
                     { 71, 6, 5 },
                     { 72, 6, 6 },
                     { 73, 1, 1 },
-                    { 74, 1, 2 }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Tile",
-                columns: new[] { "Id", "Color", "Shape" },
-                values: new object[,]
-                {
+                    { 74, 1, 2 },
                     { 75, 1, 3 },
                     { 76, 1, 4 },
                     { 77, 1, 5 },
@@ -501,8 +529,7 @@ namespace Qwirkle.Infra.Repository.Migrations
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
-                unique: true,
-                filter: "[NormalizedName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
@@ -528,22 +555,19 @@ namespace Qwirkle.Infra.Repository.Migrations
                 name: "IX_AspNetUsers_Email",
                 table: "AspNetUsers",
                 column: "Email",
-                unique: true,
-                filter: "[Email] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_Pseudo",
                 table: "AspNetUsers",
                 column: "Pseudo",
-                unique: true,
-                filter: "[Pseudo] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
-                unique: true,
-                filter: "[NormalizedUserName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Player_GameId",

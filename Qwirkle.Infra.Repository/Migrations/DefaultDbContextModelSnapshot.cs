@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Qwirkle.Infra.Repository;
 
@@ -18,9 +17,7 @@ namespace Qwirkle.Infra.Repository.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.3")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
-
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
                 {
@@ -28,26 +25,23 @@ namespace Qwirkle.Infra.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                        .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
 
@@ -55,28 +49,28 @@ namespace Qwirkle.Infra.Repository.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "5bdc0a4d-900b-4dfd-801c-afafc1132457",
+                            ConcurrencyStamp = "59f67386-577a-438c-8d7d-1d76a0ae7548",
                             Name = "Bot",
                             NormalizedName = "BOT"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "c3029150-bb16-4b67-8c99-f941f494ade1",
+                            ConcurrencyStamp = "c27b58f3-539f-4f87-9682-50ec2c3e90f7",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = 3,
-                            ConcurrencyStamp = "9019946d-650e-4b41-9df8-b27610caacd6",
+                            ConcurrencyStamp = "c9551ff8-a8ff-44ac-98c3-12c9eabf5851",
                             Name = "Guest",
                             NormalizedName = "GUEST"
                         },
                         new
                         {
                             Id = 4,
-                            ConcurrencyStamp = "2a8c07b3-ea6b-42de-8cb3-02bd05638284",
+                            ConcurrencyStamp = "ebc057eb-547c-4931-9f0f-233d4a81fa02",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -88,13 +82,11 @@ namespace Qwirkle.Infra.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
@@ -112,13 +104,11 @@ namespace Qwirkle.Infra.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -133,13 +123,13 @@ namespace Qwirkle.Infra.Repository.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -204,13 +194,13 @@ namespace Qwirkle.Infra.Repository.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
@@ -223,16 +213,14 @@ namespace Qwirkle.Infra.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("GameOver")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime>("LastPlayDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
@@ -245,22 +233,20 @@ namespace Qwirkle.Infra.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<int>("GameId")
                         .HasColumnType("int");
 
                     b.Property<byte>("GamePosition")
-                        .HasColumnType("tinyint");
+                        .HasColumnType("tinyint unsigned");
 
                     b.Property<bool>("GameTurn")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<byte>("LastTurnPoints")
-                        .HasColumnType("tinyint");
+                        .HasColumnType("tinyint unsigned");
 
                     b.Property<bool>("LastTurnSkipped")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("Points")
                         .HasColumnType("int");
@@ -282,8 +268,6 @@ namespace Qwirkle.Infra.Repository.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<int>("Color")
                         .HasColumnType("int");
@@ -952,8 +936,6 @@ namespace Qwirkle.Infra.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<int>("GameId")
                         .HasColumnType("int");
 
@@ -975,16 +957,14 @@ namespace Qwirkle.Infra.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<int>("GameId")
                         .HasColumnType("int");
 
-                    b.Property<short>("PositionX")
-                        .HasColumnType("smallint");
+                    b.Property<sbyte>("PositionX")
+                        .HasColumnType("tinyint");
 
-                    b.Property<short>("PositionY")
-                        .HasColumnType("smallint");
+                    b.Property<sbyte>("PositionY")
+                        .HasColumnType("tinyint");
 
                     b.Property<int>("TileId")
                         .HasColumnType("int");
@@ -1004,13 +984,11 @@ namespace Qwirkle.Infra.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<int>("PlayerId")
                         .HasColumnType("int");
 
                     b.Property<byte>("RackPosition")
-                        .HasColumnType("tinyint");
+                        .HasColumnType("tinyint unsigned");
 
                     b.Property<int>("TileId")
                         .HasColumnType("int");
@@ -1030,24 +1008,22 @@ namespace Qwirkle.Infra.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("GamesPlayed")
                         .HasColumnType("int");
@@ -1059,62 +1035,59 @@ namespace Qwirkle.Infra.Repository.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("Points")
                         .HasColumnType("int");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
+                        .HasColumnType("varchar(256)")
                         .HasColumnName("Pseudo");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
-                        .IsUnique()
-                        .HasFilter("[Email] IS NOT NULL");
+                        .IsUnique();
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+                        .HasDatabaseName("UserNameIndex");
 
                     b.HasIndex("UserName")
-                        .IsUnique()
-                        .HasFilter("[Pseudo] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("AspNetUsers", (string)null);
 
@@ -1123,7 +1096,7 @@ namespace Qwirkle.Infra.Repository.Migrations
                         {
                             Id = 1,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "917c8e70-ee8e-458d-8013-510628a40c66",
+                            ConcurrencyStamp = "c0866d5c-1f95-4eac-a4e8-f1fa6793e7ce",
                             Email = "bot1@bot",
                             EmailConfirmed = false,
                             GamesPlayed = 0,
@@ -1140,7 +1113,7 @@ namespace Qwirkle.Infra.Repository.Migrations
                         {
                             Id = 2,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "0bd428e7-213b-4871-bc51-4070ba1a19ff",
+                            ConcurrencyStamp = "9e2e9404-c86a-4e87-91a2-3f1917a3201a",
                             Email = "bot2@bot",
                             EmailConfirmed = false,
                             GamesPlayed = 0,
@@ -1157,7 +1130,7 @@ namespace Qwirkle.Infra.Repository.Migrations
                         {
                             Id = 3,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "65665a48-93e7-467f-9b8c-207b4ea82e82",
+                            ConcurrencyStamp = "507d8d82-13a6-49f4-83ec-7d86aa9ce2ac",
                             Email = "bot3@bot",
                             EmailConfirmed = false,
                             GamesPlayed = 0,
@@ -1174,7 +1147,7 @@ namespace Qwirkle.Infra.Repository.Migrations
                         {
                             Id = 4,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "56c1dc8b-f87d-4334-a8b6-3ebb381de554",
+                            ConcurrencyStamp = "78937220-3f19-4079-9fb0-880d1a9ba5b9",
                             Email = "bot4@bot",
                             EmailConfirmed = false,
                             GamesPlayed = 0,
@@ -1191,7 +1164,7 @@ namespace Qwirkle.Infra.Repository.Migrations
                         {
                             Id = 5,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "7e740ecb-0971-483d-86c9-c8dfc3ac4a1e",
+                            ConcurrencyStamp = "38aa0e64-62e0-424d-98c1-f693cb637e47",
                             Email = "thomas@newtomsoft.fr",
                             EmailConfirmed = false,
                             FirstName = "Thomas",
@@ -1205,7 +1178,7 @@ namespace Qwirkle.Infra.Repository.Migrations
                             PasswordHash = "AQAAAAEAACcQAAAAED29kKSVgjTdA6s6pXQ0a+7iy9MJ5Y1byxFl2MWZnX4WE6lw1SsR9FGeGypraM3G+g==",
                             PhoneNumberConfirmed = false,
                             Points = 0,
-                            SecurityStamp = "3250B471DF55411F984E2A529912AAA9",
+                            SecurityStamp = "1DCA68127F3E4B9C9D79891DF106DDE0",
                             TwoFactorEnabled = false,
                             UserName = "Tom"
                         },
@@ -1213,7 +1186,7 @@ namespace Qwirkle.Infra.Repository.Migrations
                         {
                             Id = 6,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "9890ecac-716e-4143-9954-109b6bc3b848",
+                            ConcurrencyStamp = "d401989c-4fcf-4c2a-8a88-bde513feb321",
                             Email = "jc@jc.fr",
                             EmailConfirmed = false,
                             FirstName = "Jean Charles",
@@ -1227,7 +1200,7 @@ namespace Qwirkle.Infra.Repository.Migrations
                             PasswordHash = "AQAAAAEAACcQAAAAEJOr0iSf9bL59UJqwWyCpcjdampHsvulqOZ/NTApuuwLJsc1Sf9xRquQWPIz2S8rUQ==",
                             PhoneNumberConfirmed = false,
                             Points = 0,
-                            SecurityStamp = "66953B52AC7F4FDF88696C39FA475BBB",
+                            SecurityStamp = "D5FD8008831340B29E6AAA63540BC6E3",
                             TwoFactorEnabled = false,
                             UserName = "JC"
                         });
@@ -1386,7 +1359,7 @@ namespace Qwirkle.Infra.Repository.Migrations
                     b.HasOne("Qwirkle.Infra.Repository.Dao.UserDao", null)
                         .WithMany()
                         .HasForeignKey("BookmarkedOpponentsId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

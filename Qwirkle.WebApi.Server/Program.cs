@@ -2,7 +2,7 @@
 var cors = new Cors();
 builder.Configuration.GetSection("Cors").Bind(cors);
 builder.Host.UseSerilog((_, configuration) => configuration.ReadFrom.Configuration(builder.Configuration));
-builder.Services.AddDbContext<DefaultDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Qwirkle")));
+builder.Services.AddDbContext<DefaultDbContext>(options => options.UseMySql(builder.Configuration.GetConnectionString("Qwirkle"), ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("Qwirkle"))));
 builder.Services.AddSignalR();
 builder.Services.AddResponseCompression(opts => opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" }));
 builder.Services.AddSingleton<INotification, SignalRNotification>();
